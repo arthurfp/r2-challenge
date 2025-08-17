@@ -17,10 +17,14 @@ type echoTracer struct{ tracer observability.Tracer }
 func (et echoTracer) Middleware(skipPaths ...string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ctx, end := et.tracer.StartSpan(c.Request().Context(), c.Request().Method+" "+c.Path())
-			defer end()
+			ctx, span := et.tracer.StartSpan(c.Request().Context(), c.Request().Method+" "+c.Path())
+			defer span.End()
 			c.SetRequest(c.Request().WithContext(ctx))
-			return next(c)
+			if err := next(c); err != nil {
+				span.RecordError(err)
+				return err
+			}
+			return nil
 		}
 	}
 }
