@@ -29,4 +29,23 @@ func (tm TokenManager) Generate(subject string, claims map[string]any) (string, 
     return token.SignedString(tm.secret)
 }
 
+func (tm TokenManager) Verify(tokenString string) (jwt.MapClaims, error) {
+    parsed, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
+        if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, jwt.ErrSignatureInvalid
+        }
+        return tm.secret, nil
+    }, jwt.WithIssuer(tm.issuer))
+    if err != nil {
+        return nil, err
+    }
+
+    claims, ok := parsed.Claims.(jwt.MapClaims)
+    if !ok || !parsed.Valid {
+        return nil, jwt.ErrTokenInvalidClaims
+    }
+
+    return claims, nil
+}
+
 

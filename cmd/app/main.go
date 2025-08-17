@@ -14,6 +14,8 @@ import (
 	"r2-challenge/pkg/observability"
 	"r2-challenge/pkg/validator"
 
+	"r2-challenge/pkg/auth"
+
 	producthttp "r2-challenge/internal/product/adapters/http"
 	productdb "r2-challenge/internal/product/adapters/db"
 	productcmd "r2-challenge/internal/product/services/command"
@@ -80,15 +82,25 @@ func runHTTPServer(
 	e := httpx.NewServer(tracer)
 
 	v1 := e.Group("/v1")
+
+	ttl, _ := time.ParseDuration(envs.JWTExpire)
+	tm := auth.NewTokenManager(envs.JWTSecret, envs.JWTIssuer, ttl)
+	e.Use(auth.JWTMiddleware(tm, func(method, path string) bool {
+		_, ok := publicRoutes[routeKey{Method: method, Path: path}]
+		return ok
+	}))
+
+	// Product routes
 	v1.POST("/products", create.Handle)
 	v1.GET("/products/:id", get.Handle)
 	v1.GET("/products", list.Handle)
 	v1.PUT("/products/:id", update.Handle)
 	v1.DELETE("/products/:id", deleteH.Handle)
 
-	auth := v1.Group("/auth")
-	auth.POST("/register", register.Handle)
-	auth.POST("/login", login.Handle)
+	// Auth / Users
+	authg := v1.Group("/auth")
+	authg.POST("/register", register.Handle)
+	authg.POST("/login", login.Handle)
 
 	v1.GET("/users/:id", getUser.Handle)
 	v1.GET("/users", listUsers.Handle)
