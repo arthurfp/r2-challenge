@@ -13,6 +13,11 @@ import (
 	"r2-challenge/pkg/logger"
 	"r2-challenge/pkg/observability"
 	"r2-challenge/pkg/validator"
+
+	producthttp "r2-challenge/internal/product/adapters/http"
+	productdb "r2-challenge/internal/product/adapters/db"
+	productcmd "r2-challenge/internal/product/services/command"
+	productqry "r2-challenge/internal/product/services/query"
 )
 
 func main() {
@@ -24,8 +29,23 @@ func main() {
 			validator.Setup,
 			db.Setup,
 		),
+
+		fx.Provide(
+			productdb.NewDBRepository,
+			productcmd.NewCreateService,
+			productcmd.NewUpdateService,
+			productcmd.NewDeleteService,
+			productqry.NewService,
+			producthttp.NewCreateHandler,
+			producthttp.NewUpdateHandler,
+			producthttp.NewDeleteHandler,
+			producthttp.NewGetHandler,
+			producthttp.NewListHandler,
+		),
+
 		fx.Invoke(runHTTPServer),
 	)
+
 	app.Run()
 }
 
@@ -34,11 +54,20 @@ func runHTTPServer(
 	envs envs.Envs,
 	tracer observability.Tracer,
 	_ *db.Database,
+	create producthttp.CreateHandler,
+	update producthttp.UpdateHandler,
+	deleteH producthttp.DeleteHandler,
+	get producthttp.GetHandler,
+	list producthttp.ListHandler,
 ) error {
 	e := httpx.NewServer(tracer)
 
 	v1 := e.Group("/v1")
-	_ = v1
+	v1.POST("/products", create.Handle)
+	v1.GET("/products/:id", get.Handle)
+	v1.GET("/products", list.Handle)
+	v1.PUT("/products/:id", update.Handle)
+	v1.DELETE("/products/:id", deleteH.Handle)
 
 	readHeaderTimeout, _ := time.ParseDuration(envs.ReadHeaderTimeout)
 	httpTimeout, _ := time.ParseDuration(envs.HTTPTimeout)
