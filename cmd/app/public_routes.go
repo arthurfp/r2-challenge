@@ -18,6 +18,7 @@ var publicRoutes = map[routeKey]struct{}{
     {Method: POST, Path: "/v1/auth/login"}:   {},
     {Method: GET, Path: "/v1/products"}:      {},
     {Method: GET, Path: "/v1/products/:id"}:  {},
+    {Method: GET, Path: "/v1/orders/:id"}:    {},
 }
 
 
