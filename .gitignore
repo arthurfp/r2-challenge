@@ -1,0 +1,43 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# Go build
+bin/
+build/
+dist/
+
+# Vendor
+vendor/
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Coverage
+coverage.out
+
+# Binaries
+/dist/
+/build/
+/bin/
+*.exe
+*.out
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Go
+vendor/
