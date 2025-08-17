@@ -9,7 +9,7 @@ import (
 )
 
 type UpdateService interface {
-    Update(ctx context.Context, p domain.Product) (domain.Product, error)
+    Update(ctx context.Context, product domain.Product) (domain.Product, error)
 }
 
 type updateService struct {
@@ -21,11 +21,11 @@ func NewUpdateService(r repo.ProductRepository, t observability.Tracer) (UpdateS
     return &updateService{repo: r, tracer: t}, nil
 }
 
-func (s *updateService) Update(ctx context.Context, p domain.Product) (domain.Product, error) {
+func (s *updateService) Update(ctx context.Context, product domain.Product) (domain.Product, error) {
     ctx, span := s.tracer.StartSpan(ctx, "ProductCommand.Update")
     defer span.End()
 
-    res, err := s.repo.Update(ctx, p)
+    res, err := s.repo.Update(ctx, product)
     if err != nil {
         span.RecordError(err)
         return res, err

@@ -24,19 +24,19 @@ func (h GetHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.GetByID")
     defer span.End()
 
-    id := c.Param("id")
-    if err := h.validator.Var(id, "required"); err != nil {
+    productID := c.Param("id")
+    if err := h.validator.Var(productID, "required"); err != nil {
         span.RecordError(err)
         return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
     }
 
-    p, err := h.service.GetByID(ctx, id)
+    product, err := h.service.GetByID(ctx, productID)
     if err != nil {
         span.RecordError(err)
         return c.JSON(http.StatusNotFound, map[string]string{"error": "not found"})
     }
 
-    return c.JSON(http.StatusOK, p)
+    return c.JSON(http.StatusOK, product)
 }
 
 

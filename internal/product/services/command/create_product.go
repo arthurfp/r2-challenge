@@ -9,7 +9,7 @@ import (
 )
 
 type CreateService interface {
-    Create(ctx context.Context, p domain.Product) (domain.Product, error)
+    Create(ctx context.Context, product domain.Product) (domain.Product, error)
 }
 
 type createService struct {
@@ -21,11 +21,11 @@ func NewCreateService(r repo.ProductRepository, t observability.Tracer) (CreateS
     return &createService{repo: r, tracer: t}, nil
 }
 
-func (s *createService) Create(ctx context.Context, p domain.Product) (domain.Product, error) {
+func (s *createService) Create(ctx context.Context, product domain.Product) (domain.Product, error) {
     ctx, span := s.tracer.StartSpan(ctx, "ProductCommand.Create")
     defer span.End()
 
-    res, err := s.repo.Save(ctx, p)
+    res, err := s.repo.Save(ctx, product)
     if err != nil {
         span.RecordError(err)
         return res, err

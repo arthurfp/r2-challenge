@@ -33,8 +33,8 @@ func (h UpdateHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.Update")
     defer span.End()
 
-    id := c.Param("id")
-    if err := h.validator.Var(id, "required"); err != nil {
+    productID := c.Param("id")
+    if err := h.validator.Var(productID, "required"); err != nil {
         span.RecordError(err)
         return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
     }
@@ -49,8 +49,8 @@ func (h UpdateHandler) Handle(c echo.Context) error {
         return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
     }
 
-    p := domain.Product{ID: id, Name: req.Name, Description: req.Description, Category: req.Category, PriceCents: req.PriceCents, Inventory: req.Inventory}
-    updated, err := h.service.Update(ctx, p)
+    product := domain.Product{ID: productID, Name: req.Name, Description: req.Description, Category: req.Category, PriceCents: req.PriceCents, Inventory: req.Inventory}
+    updated, err := h.service.Update(ctx, product)
     if err != nil {
         span.RecordError(err)
         return c.JSON(http.StatusNotFound, map[string]string{"error": "not found"})

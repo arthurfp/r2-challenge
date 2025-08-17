@@ -7,7 +7,7 @@ import (
     "r2-challenge/pkg/observability"
 )
 
-type DeleteService interface { Delete(ctx context.Context, id string) error }
+type DeleteService interface { Delete(ctx context.Context, productID string) error }
 
 type deleteService struct {
     repo   repo.ProductRepository
@@ -18,14 +18,15 @@ func NewDeleteService(r repo.ProductRepository, t observability.Tracer) (DeleteS
     return &deleteService{repo: r, tracer: t}, nil
 }
 
-func (s *deleteService) Delete(ctx context.Context, id string) error {
+func (s *deleteService) Delete(ctx context.Context, productID string) error {
     ctx, span := s.tracer.StartSpan(ctx, "ProductCommand.Delete")
     defer span.End()
 
-    if err := s.repo.Delete(ctx, id); err != nil {
+    if err := s.repo.Delete(ctx, productID); err != nil {
         span.RecordError(err)
         return err
     }
+    
     return nil
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 type RegisterService interface {
-    Register(ctx context.Context, u domain.User, plainPassword string) (domain.User, error)
+    Register(ctx context.Context, user domain.User, plainPassword string) (domain.User, error)
 }
 
 type registerService struct {
@@ -23,7 +23,7 @@ func NewRegisterService(r repo.UserRepository, t observability.Tracer) (Register
     return &registerService{repo: r, tracer: t}, nil
 }
 
-func (s *registerService) Register(ctx context.Context, u domain.User, plainPassword string) (domain.User, error) {
+func (s *registerService) Register(ctx context.Context, user domain.User, plainPassword string) (domain.User, error) {
     ctx, span := s.tracer.StartSpan(ctx, "UserCommand.Register")
     defer span.End()
 
@@ -33,9 +33,9 @@ func (s *registerService) Register(ctx context.Context, u domain.User, plainPass
         return domain.User{}, err
     }
 
-    u.PasswordHash = string(hashed)
+    user.PasswordHash = string(hashed)
 
-    saved, err := s.repo.Save(ctx, u)
+    saved, err := s.repo.Save(ctx, user)
     if err != nil {
         span.RecordError(err)
         return domain.User{}, err
