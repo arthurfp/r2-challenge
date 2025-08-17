@@ -18,6 +18,11 @@ import (
 	productdb "r2-challenge/internal/product/adapters/db"
 	productcmd "r2-challenge/internal/product/services/command"
 	productqry "r2-challenge/internal/product/services/query"
+
+	userhttp "r2-challenge/internal/user/adapters/http"
+	userdb "r2-challenge/internal/user/adapters/db"
+	usercmd "r2-challenge/internal/user/services/command"
+	userqry "r2-challenge/internal/user/services/query"
 )
 
 func main() {
@@ -41,6 +46,14 @@ func main() {
 			producthttp.NewDeleteHandler,
 			producthttp.NewGetHandler,
 			producthttp.NewListHandler,
+
+			userdb.NewDBRepository,
+			usercmd.NewRegisterService,
+			userqry.NewService,
+			userhttp.NewRegisterHandler,
+			userhttp.NewLoginHandler,
+			userhttp.NewGetUserHandler,
+			userhttp.NewListUsersHandler,
 		),
 
 		fx.Invoke(runHTTPServer),
@@ -59,6 +72,10 @@ func runHTTPServer(
 	deleteH producthttp.DeleteHandler,
 	get producthttp.GetHandler,
 	list producthttp.ListHandler,
+	register userhttp.RegisterHandler,
+	login userhttp.LoginHandler,
+	getUser userhttp.GetUserHandler,
+	listUsers userhttp.ListUsersHandler,
 ) error {
 	e := httpx.NewServer(tracer)
 
@@ -68,6 +85,13 @@ func runHTTPServer(
 	v1.GET("/products", list.Handle)
 	v1.PUT("/products/:id", update.Handle)
 	v1.DELETE("/products/:id", deleteH.Handle)
+
+	auth := v1.Group("/auth")
+	auth.POST("/register", register.Handle)
+	auth.POST("/login", login.Handle)
+
+	v1.GET("/users/:id", getUser.Handle)
+	v1.GET("/users", listUsers.Handle)
 
 	readHeaderTimeout, _ := time.ParseDuration(envs.ReadHeaderTimeout)
 	httpTimeout, _ := time.ParseDuration(envs.HTTPTimeout)

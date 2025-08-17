@@ -20,6 +20,10 @@ type Envs struct {
 	DBMaxOpenConns    int    `cfg:"DB_MAX_OPEN_CONNS" cfgDefault:"10"`
 	DBMaxIdleConns    int    `cfg:"DB_MAX_IDLE_CONNS" cfgDefault:"5"`
 	DBConnMaxLifetime string `cfg:"DB_CONN_MAX_LIFETIME" cfgDefault:"1h"`
+
+	JWTSecret         string `cfg:"JWT_SECRET" cfgDefault:"devsecret"`
+	JWTIssuer         string `cfg:"JWT_ISSUER" cfgDefault:"r2-challenge"`
+	JWTExpire         string `cfg:"JWT_EXPIRE" cfgDefault:"1h"`
 }
 
 func NewEnvs() (Envs, error) {
