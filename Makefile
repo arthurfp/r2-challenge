@@ -10,6 +10,9 @@ tidy:
 test:
 	go test ./...
 
+lint:
+	./bin/golangci-lint run ./...
+
 docker-up:
 	docker compose up -d db
 
