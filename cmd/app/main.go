@@ -60,11 +60,13 @@ func main() {
 
 			userdb.NewDBRepository,
 			usercmd.NewRegisterService,
+			usercmd.NewUpdateProfileService,
 			userqry.NewService,
 			userhttp.NewRegisterHandler,
 			userhttp.NewLoginHandler,
 			userhttp.NewGetUserHandler,
 			userhttp.NewListUsersHandler,
+			userhttp.NewUpdateProfileHandler,
 
 			orderdb.NewDBRepository,
 			payment.NewMockProcessor,
@@ -100,6 +102,7 @@ func runHTTPServer(
 	login userhttp.LoginHandler,
 	getUser userhttp.GetUserHandler,
 	listUsers userhttp.ListUsersHandler,
+	updateProfile userhttp.UpdateProfileHandler,
 	place orderhttp.PlaceOrderHandler,
 	getOrder orderhttp.GetOrderHandler,
 	listOrders orderhttp.ListUserOrdersHandler,
@@ -116,12 +119,12 @@ func runHTTPServer(
 		return ok
 	}))
 
-	// Product routes
-	v1.POST("/products", create.Handle)
+	// Product routes (admin-only for mutations)
+	v1.POST("/products", auth.RequireRoles("admin")(create.Handle))
+	v1.PUT("/products/:id", auth.RequireRoles("admin")(update.Handle))
+	v1.DELETE("/products/:id", auth.RequireRoles("admin")(deleteH.Handle))
 	v1.GET("/products/:id", get.Handle)
 	v1.GET("/products", list.Handle)
-	v1.PUT("/products/:id", update.Handle)
-	v1.DELETE("/products/:id", deleteH.Handle)
 
 	// Auth / Users
 	authg := v1.Group("/auth")
@@ -130,6 +133,7 @@ func runHTTPServer(
 
 	v1.GET("/users/:id", getUser.Handle)
 	v1.GET("/users", listUsers.Handle)
+	v1.PUT("/users/me", updateProfile.Handle)
 
 	// Orders
 	v1.POST("/orders", place.Handle)

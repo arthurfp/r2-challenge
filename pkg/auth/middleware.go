@@ -42,4 +42,21 @@ func JWTMiddleware(tm TokenManager, isPublic func(method, path string) bool) ech
     }
 }
 
+func RequireRoles(allowed ...string) echo.MiddlewareFunc {
+    allowedSet := map[string]struct{}{}
+    for _, r := range allowed {
+        allowedSet[r] = struct{}{}
+    }
+
+    return func(next echo.HandlerFunc) echo.HandlerFunc {
+        return func(c echo.Context) error {
+            role, _ := c.Get(CtxRole).(string)
+            if _, ok := allowedSet[role]; !ok {
+                return c.JSON(http.StatusForbidden, map[string]string{"error": "forbidden"})
+            }
+            return next(c)
+        }
+    }
+}
+
 
