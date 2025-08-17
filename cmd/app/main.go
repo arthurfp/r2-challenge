@@ -30,6 +30,10 @@ import (
 	orderdb "r2-challenge/internal/order/adapters/db"
 	ordercmd "r2-challenge/internal/order/services/command"
 	orderqry "r2-challenge/internal/order/services/query"
+	payment "r2-challenge/internal/order/adapters/payment"
+	notification "r2-challenge/internal/order/adapters/notification"
+	pmtdb "r2-challenge/internal/payment/adapters/db"
+	pmtcmd "r2-challenge/internal/payment/services/command"
 )
 
 func main() {
@@ -63,6 +67,10 @@ func main() {
 			userhttp.NewListUsersHandler,
 
 			orderdb.NewDBRepository,
+			payment.NewMockProcessor,
+			notification.NewMockSender,
+			pmtdb.NewDBRepository,
+			pmtcmd.NewService,
 			ordercmd.NewPlaceOrderService,
 			ordercmd.NewUpdateStatusService,
 			orderqry.NewService,
