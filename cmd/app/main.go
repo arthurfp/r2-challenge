@@ -9,6 +9,7 @@ import (
 
 	"r2-challenge/cmd/envs"
 	"r2-challenge/pkg/httpx"
+	"r2-challenge/pkg/db"
 	"r2-challenge/pkg/logger"
 	"r2-challenge/pkg/observability"
 	"r2-challenge/pkg/validator"
@@ -21,6 +22,7 @@ func main() {
 			logger.Setup,
 			observability.SetupTracer,
 			validator.Setup,
+			db.Setup,
 		),
 		fx.Invoke(runHTTPServer),
 	)
@@ -31,6 +33,7 @@ func runHTTPServer(
 	lc fx.Lifecycle,
 	envs envs.Envs,
 	tracer observability.Tracer,
+	_ *db.Database,
 ) error {
 	e := httpx.NewServer(tracer)
 

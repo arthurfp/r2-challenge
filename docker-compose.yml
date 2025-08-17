@@ -1,0 +1,59 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: r2_db
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    image: r2-challenge:local
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      HTTP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: r2_db
+      DB_SSLMODE: disable
+      JWT_SECRET: devsecret
+      JWT_ISSUER: r2-challenge
+      JWT_EXPIRE: 1h
+      RATE_LIMIT_RPM: 120
+      METRICS_ENABLED: "true"
+      METRICS_PATH: /metrics
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8080:8080"
+    # Uncomment to expose metrics on a dedicated port
+    # environment:
+    #   METRICS_PORT: 9090
+    # ports:
+    #   - "8080:8080"
+    #   - "9090:9090"
+volumes:
+  db_data:
+
+
