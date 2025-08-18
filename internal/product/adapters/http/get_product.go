@@ -20,6 +20,16 @@ func NewGetHandler(s query.GetByIDService, v *validator.Validate, t observabilit
     return GetHandler{service: s, validator: v, tracer: t}, nil
 }
 
+// Get Product by ID
+// @Summary      Get product
+// @Description  Get a product by ID
+// @Tags         Products
+// @Produce      json
+// @Param        id   path     string  true  "Product ID"
+// @Success      200  {object} map[string]any
+// @Failure      400  {object} map[string]string "Bad Request"
+// @Failure      404  {object} map[string]string "Not Found"
+// @Router       /v1/products/{id} [get]
 func (h GetHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.GetByID")
     defer span.End()

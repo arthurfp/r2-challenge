@@ -20,6 +20,16 @@ func NewGetUserHandler(s query.GetByIDService, v *validator.Validate, t observab
     return GetUserHandler{service: s, validator: v, tracer: t}, nil
 }
 
+// Get User by ID
+// @Summary      Get user
+// @Description  Get a user by ID
+// @Tags         Users
+// @Produce      json
+// @Param        id   path     string  true  "User ID"
+// @Success      200  {object} map[string]any
+// @Failure      400  {object} map[string]string "Bad Request"
+// @Failure      404  {object} map[string]string "Not Found"
+// @Router       /v1/users/{id} [get]
 func (h GetUserHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.GetUser")
     defer span.End()

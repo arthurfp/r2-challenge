@@ -22,6 +22,20 @@ func NewListHandler(s query.ListService, v *validator.Validate, t observability.
     return ListHandler{service: s, validator: v, tracer: t}, nil
 }
 
+// List Products
+// @Summary      List products
+// @Description  List products with optional filters
+// @Tags         Products
+// @Produce      json
+// @Param        category  query    string  false  "Category"
+// @Param        name      query    string  false  "Name contains"
+// @Param        sort      query    string  false  "Sort by (name, price_cents, etc)"
+// @Param        order     query    string  false  "asc|desc"
+// @Param        limit     query    int     false  "Limit"
+// @Param        offset    query    int     false  "Offset"
+// @Success      200       {array}  map[string]any
+// @Failure      500       {object} map[string]string "Internal Server Error"
+// @Router       /v1/products [get]
 func (h ListHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.List")
     defer span.End()

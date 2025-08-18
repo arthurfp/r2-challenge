@@ -22,6 +22,18 @@ func NewListUsersHandler(s query.ListService, v *validator.Validate, t observabi
     return ListUsersHandler{service: s, validator: v, tracer: t}, nil
 }
 
+// List Users
+// @Summary      List users
+// @Description  List users with optional filters
+// @Tags         Users
+// @Produce      json
+// @Param        email   query    string  false  "Email"
+// @Param        name    query    string  false  "Name contains"
+// @Param        limit   query    int     false  "Limit"
+// @Param        offset  query    int     false  "Offset"
+// @Success      200     {array}  map[string]any
+// @Failure      500     {object} map[string]string "Internal Server Error"
+// @Router       /v1/users [get]
 func (h ListUsersHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.List")
     defer span.End()

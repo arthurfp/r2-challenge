@@ -27,6 +27,17 @@ type registerRequest struct {
     Password string `json:"password" validate:"required,min=6"`
 }
 
+// Register User
+// @Summary      Register user
+// @Description  Create a new user account
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      registerRequest  true  "User input"
+// @Success      201   {object}  domain.User
+// @Failure      400   {object}  map[string]string "Bad Request"
+// @Failure      500   {object}  map[string]string "Internal Server Error"
+// @Router       /v1/auth/register [post]
 func (h RegisterHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.Register")
     defer span.End()

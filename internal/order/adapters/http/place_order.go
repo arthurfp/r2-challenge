@@ -30,6 +30,18 @@ type placeOrderRequest struct {
     } `json:"items" validate:"required,dive"`
 }
 
+// Place Order
+// @Summary      Place order
+// @Description  Create an order for the authenticated user
+// @Tags         Orders
+// @Accept       json
+// @Produce      json
+// @Param        order  body  placeOrderRequest  true  "Order input"
+// @Success      201    {object} domain.Order
+// @Failure      400    {object} map[string]string "Bad Request"
+// @Failure      401    {object} map[string]string "Unauthorized"
+// @Failure      500    {object} map[string]string "Internal Server Error"
+// @Router       /v1/orders [post]
 func (h PlaceOrderHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.Place")
     defer span.End()

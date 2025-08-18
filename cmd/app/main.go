@@ -1,5 +1,11 @@
 package main
 
+// @title           R2 Challenge API
+// @version         1.0
+// @description     REST API for e-commerce (products, users, orders)
+// @BasePath        /
+// @schemes         http https
+
 import (
 	"fmt"
 	"net/http"
@@ -38,6 +44,9 @@ import (
 	pmtcmd "r2-challenge/internal/payment/services/command"
 )
 
+// @title R2 Ecoomerce API
+
+// @BasePath /v1
 func main() {
 	app := fx.New(
 		fx.Provide(

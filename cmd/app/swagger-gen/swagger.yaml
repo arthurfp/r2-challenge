@@ -1,0 +1,828 @@
+openapi: 3.0.1
+info:
+  contact: {}
+  description: "REST API for e-commerce (products, users, orders)"
+  title: R2 Ecoomerce API
+  version: "1.0"
+servers:
+- url: /v1
+paths:
+  /v1/auth/login:
+    post:
+      description: Authenticate and receive a JWT token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_user_adapters_http.loginRequest"
+        description: Login credentials
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: access_token
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Unauthorized
+      summary: Login
+      tags:
+      - Auth
+      x-codegen-request-body-name: credentials
+  /v1/auth/register:
+    post:
+      description: Create a new user account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_user_adapters_http.registerRequest"
+        description: User input
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/r2-challenge_internal_user_domain.User"
+          description: Created
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: Register user
+      tags:
+      - Auth
+      x-codegen-request-body-name: user
+  /v1/orders:
+    post:
+      description: Create an order for the authenticated user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_order_adapters_http.placeOrderRequest"
+        description: Order input
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/r2-challenge_internal_order_domain.Order"
+          description: Created
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: Place order
+      tags:
+      - Orders
+      x-codegen-request-body-name: order
+  /v1/orders/{id}:
+    get:
+      description: Get order by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Not Found
+      summary: Get order
+      tags:
+      - Orders
+  /v1/orders/{id}/status:
+    put:
+      description: Update status for an order by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_order_adapters_http.updateStatusRequest"
+        description: Status input
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: Update order status
+      tags:
+      - Orders
+      x-codegen-request-body-name: body
+  /v1/products:
+    get:
+      description: List products with optional filters
+      parameters:
+      - description: Category
+        in: query
+        name: category
+        schema:
+          type: string
+      - description: Name contains
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: "Sort by (name, price_cents, etc)"
+        in: query
+        name: sort
+        schema:
+          type: string
+      - description: asc|desc
+        in: query
+        name: order
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: List products
+      tags:
+      - Products
+    post:
+      description: Create a new product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_product_adapters_http.createProductRequest"
+        description: Product input
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/r2-challenge_internal_product_domain.Product"
+          description: Created
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: Create product
+      tags:
+      - Products
+      x-codegen-request-body-name: product
+  /v1/products/{id}:
+    delete:
+      description: Delete a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Not Found
+      summary: Delete product
+      tags:
+      - Products
+    get:
+      description: Get a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Not Found
+      summary: Get product
+      tags:
+      - Products
+    put:
+      description: Update a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_product_adapters_http.updateProductRequest"
+        description: Product input
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/r2-challenge_internal_product_domain.Product"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Not Found
+      summary: Update product
+      tags:
+      - Products
+      x-codegen-request-body-name: product
+  /v1/users:
+    get:
+      description: List users with optional filters
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        schema:
+          type: string
+      - description: Name contains
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: List users
+      tags:
+      - Users
+  /v1/users/{id}:
+    get:
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Not Found
+      summary: Get user
+      tags:
+      - Users
+  /v1/users/{id}/orders:
+    get:
+      description: List orders for the authenticated user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+          description: OK
+        "401":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: List my orders
+      tags:
+      - Orders
+  /v1/users/me:
+    put:
+      description: Update authenticated user's profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/internal_user_adapters_http.updateProfileRequest"
+        description: Profile input
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/r2-challenge_internal_user_domain.User"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Unauthorized
+        "500":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: Internal Server Error
+      summary: Update my profile
+      tags:
+      - Users
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    internal_order_adapters_http.placeOrderRequest:
+      properties:
+        items:
+          items:
+            $ref: "#/components/schemas/internal_order_adapters_http_placeOrderRequest_items_inner"
+          type: array
+      required:
+      - items
+      type: object
+    internal_order_adapters_http.updateStatusRequest:
+      properties:
+        status:
+          type: string
+      required:
+      - status
+      type: object
+    internal_product_adapters_http.createProductRequest:
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        inventory:
+          minimum: 0
+          type: integer
+        name:
+          minLength: 3
+          type: string
+        price_cents:
+          minimum: 0
+          type: integer
+      required:
+      - category
+      - name
+      - price_cents
+      type: object
+    internal_product_adapters_http.updateProductRequest:
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        inventory:
+          minimum: 0
+          type: integer
+        name:
+          minLength: 3
+          type: string
+        price_cents:
+          minimum: 0
+          type: integer
+      required:
+      - category
+      - name
+      - price_cents
+      type: object
+    internal_user_adapters_http.loginRequest:
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    internal_user_adapters_http.registerRequest:
+      properties:
+        email:
+          type: string
+        name:
+          minLength: 3
+          type: string
+        password:
+          minLength: 6
+          type: string
+      required:
+      - email
+      - name
+      - password
+      type: object
+    internal_user_adapters_http.updateProfileRequest:
+      properties:
+        email:
+          type: string
+        name:
+          minLength: 3
+          type: string
+      required:
+      - email
+      - name
+      type: object
+    r2-challenge_internal_order_domain.Order:
+      example:
+        updated_at: updated_at
+        user_id: user_id
+        created_at: created_at
+        id: id
+        items:
+        - quantity: 6
+          product_id: product_id
+          price_cents: 0
+          id: id
+          order_id: order_id
+        - quantity: 6
+          product_id: product_id
+          price_cents: 0
+          id: id
+          order_id: order_id
+        total_cents: 1
+        status: status
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        items:
+          items:
+            $ref: "#/components/schemas/r2-challenge_internal_order_domain.OrderItem"
+          type: array
+        status:
+          type: string
+        total_cents:
+          type: integer
+        updated_at:
+          type: string
+        user_id:
+          type: string
+      required:
+      - user_id
+      type: object
+    r2-challenge_internal_order_domain.OrderItem:
+      example:
+        quantity: 6
+        product_id: product_id
+        price_cents: 0
+        id: id
+        order_id: order_id
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        price_cents:
+          minimum: 0
+          type: integer
+        product_id:
+          type: string
+        quantity:
+          type: integer
+      required:
+      - price_cents
+      - product_id
+      - quantity
+      type: object
+    r2-challenge_internal_product_domain.Product:
+      example:
+        updated_at: updated_at
+        name: name
+        created_at: created_at
+        description: description
+        price_cents: 0
+        id: id
+        category: category
+        inventory: 0
+      properties:
+        category:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        inventory:
+          minimum: 0
+          type: integer
+        name:
+          minLength: 3
+          type: string
+        price_cents:
+          minimum: 0
+          type: integer
+        updated_at:
+          type: string
+      required:
+      - category
+      - name
+      - price_cents
+      type: object
+    r2-challenge_internal_user_domain.User:
+      example:
+        role: role
+        updated_at: updated_at
+        name: name
+        created_at: created_at
+        id: id
+        email: email
+      properties:
+        created_at:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+        name:
+          minLength: 3
+          type: string
+        role:
+          type: string
+        updated_at:
+          type: string
+      required:
+      - email
+      - name
+      - role
+      type: object
+    internal_order_adapters_http_placeOrderRequest_items_inner:
+      properties:
+        price_cents:
+          minimum: 0
+          type: integer
+        product_id:
+          type: string
+        quantity:
+          type: integer
+      required:
+      - price_cents
+      - product_id
+      - quantity
+      type: object
+x-original-swagger-version: "2.0"

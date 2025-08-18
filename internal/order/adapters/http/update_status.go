@@ -22,6 +22,18 @@ func NewUpdateStatusHandler(s command.UpdateStatusService, v *validator.Validate
 
 type updateStatusRequest struct { Status string `json:"status" validate:"required"` }
 
+// Update Order Status
+// @Summary      Update order status
+// @Description  Update status for an order by ID
+// @Tags         Orders
+// @Accept       json
+// @Produce      json
+// @Param        id    path  string               true  "Order ID"
+// @Param        body  body  updateStatusRequest  true  "Status input"
+// @Success      200   {object} map[string]any
+// @Failure      400   {object} map[string]string "Bad Request"
+// @Failure      500   {object} map[string]string "Internal Server Error"
+// @Router       /v1/orders/{id}/status [put]
 func (h UpdateStatusHandler) Handle(c echo.Context) error {
 	ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.UpdateStatus")
 	defer span.End()

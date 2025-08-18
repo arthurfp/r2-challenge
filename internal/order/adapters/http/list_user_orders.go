@@ -23,6 +23,18 @@ func NewListUserOrdersHandler(s query.ListByUserService, v *validator.Validate, 
     return ListUserOrdersHandler{service: s, validator: v, tracer: t}, nil
 }
 
+// List My Orders
+// @Summary      List my orders
+// @Description  List orders for the authenticated user
+// @Tags         Orders
+// @Produce      json
+// @Param        id      path     string  true  "User ID"
+// @Param        limit   query    int  false  "Limit"
+// @Param        offset  query    int  false  "Offset"
+// @Success      200     {array}  map[string]any
+// @Failure      401     {object} map[string]string "Unauthorized"
+// @Failure      500     {object} map[string]string "Internal Server Error"
+// @Router       /v1/users/{id}/orders [get]
 func (h ListUserOrdersHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.ListByUser")
     defer span.End()

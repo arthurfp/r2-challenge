@@ -54,7 +54,12 @@ scrape_configs:
 - Products: `docs/api/products.md`
 - Users: `docs/api/users.md`
 - Orders: `docs/api/orders.md`
- - Deployment: `docs/deployment.md`
+- Deployment: `docs/deployment.md`
+
+### OpenAPI / Swagger
+- OpenAPI spec is generated from annotations on HTTP handlers.
+- Generate/update spec with: `make swaggen` (alias to `swag-gen-app`).
+- Output file: `cmd/app/swagger-gen/swagger.yaml`.
 
 ## Structure
 - `cmd/app`: DI (fx), HTTP server and route registration

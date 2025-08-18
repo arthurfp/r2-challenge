@@ -29,6 +29,18 @@ type updateProductRequest struct {
     Inventory   int64  `json:"inventory" validate:"gte=0"`
 }
 
+// Update Product
+// @Summary      Update product
+// @Description  Update a product by ID
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        id       path     string                 true  "Product ID"
+// @Param        product  body     updateProductRequest   true  "Product input"
+// @Success      200      {object} domain.Product
+// @Failure      400      {object} map[string]string "Bad Request"
+// @Failure      404      {object} map[string]string "Not Found"
+// @Router       /v1/products/{id} [put]
 func (h UpdateHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.Update")
     defer span.End()
