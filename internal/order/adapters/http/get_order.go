@@ -46,6 +46,13 @@ func (h GetOrderHandler) Handle(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "not found"})
 	}
 
+	// Authorization: only owner or admin can access
+	role, _ := c.Get("role").(string)
+	userID, _ := c.Get("userId").(string)
+	if role != "admin" && order.UserID != userID {
+		return c.JSON(http.StatusForbidden, map[string]string{"error": "forbidden"})
+	}
+
 	return c.JSON(http.StatusOK, order)
 }
 

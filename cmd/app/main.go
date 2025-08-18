@@ -211,13 +211,13 @@ func runHTTPServer(
 	authg.POST("/register", register.Handle)
 	authg.POST("/login", login.Handle)
 
-	v1.GET("/users/:id", getUser.Handle)
+	v1.GET("/users/:id", auth.RequireSelfOrRoles("id", "admin")(getUser.Handle))
 	v1.GET("/users", auth.RequireRoles("admin")(listUsers.Handle))
 	v1.PUT("/users/me", updateProfile.Handle)
 
 	// Orders
 	v1.POST("/orders", place.Handle)
-	v1.GET("/orders/:id", getOrder.Handle)
+	v1.GET("/orders/:id", auth.RequireRoles("admin")(getOrder.Handle))
 	v1.GET("/users/:id/orders", listOrders.Handle)
 	v1.PUT("/orders/:id/status", auth.RequireRoles("admin")(updateOrderStatus.Handle))
 
