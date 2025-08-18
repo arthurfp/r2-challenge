@@ -9,6 +9,8 @@ make db-setup
 make test
 # to run the app
 # go run ./cmd/app
+ # or with Docker
+ make docker-build && make docker-run
 
 ## Environment
 - `HTTP_HOST` (default: localhost)
@@ -52,6 +54,7 @@ scrape_configs:
 - Products: `docs/api/products.md`
 - Users: `docs/api/users.md`
 - Orders: `docs/api/orders.md`
+ - Deployment: `docs/deployment.md`
 
 ## Structure
 - `cmd/app`: DI (fx), HTTP server and route registration

@@ -27,3 +27,12 @@ migrate:
 
 db-setup: docker-up wait-db migrate
 
+
+# Build Docker image
+docker-build:
+	docker build -t r2-challenge:local .
+
+# Run container (requires DB envs configured or external DB)
+docker-run:
+	docker run --rm -p 8080:8080 -e DB_HOST=host.docker.internal -e DB_USER=postgres -e DB_PASSWORD=postgres -e DB_NAME=r2_db r2-challenge:local
+
