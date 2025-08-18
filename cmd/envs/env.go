@@ -10,6 +10,9 @@ type Envs struct {
 	HTTPPort          string `cfg:"HTTP_PORT" cfgRequired:"true" cfgDefault:"8080"`
 	ReadHeaderTimeout string `cfg:"READ_HEADER_TIMEOUT" cfgDefault:"15s"`
 	HTTPTimeout       string `cfg:"HTTP_TIMEOUT" cfgDefault:"10s"`
+	RateLimitRPM      int    `cfg:"RATE_LIMIT_RPM" cfgDefault:"60"`
+	TLSCertFile       string `cfg:"TLS_CERT_FILE"`
+	TLSKeyFile        string `cfg:"TLS_KEY_FILE"`
 
 	DBHost            string `cfg:"DB_HOST" cfgDefault:"localhost"`
 	DBPort            string `cfg:"DB_PORT" cfgDefault:"5432"`

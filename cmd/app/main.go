@@ -110,6 +110,9 @@ func runHTTPServer(
 ) error {
 	e := httpx.NewServer(tracer)
 
+	// Rate limit per IP (RPM configurable)
+	e.Use(httpx.RateLimitMiddleware(envs.RateLimitRPM))
+
 	v1 := e.Group("/v1")
 
 	ttl, _ := time.ParseDuration(envs.JWTExpire)
@@ -149,7 +152,8 @@ func runHTTPServer(
 		Handler:           e,
 	}
 
-	lc.Append(httpx.ServerLifecycle(e, server, httpTimeout))
+	// TLS if cert/key provided via envs
+	lc.Append(httpx.ServerLifecycleTLS(e, server, httpTimeout, envs.TLSCertFile, envs.TLSKeyFile))
 	return nil
 }
 
