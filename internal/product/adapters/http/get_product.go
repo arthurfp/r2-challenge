@@ -29,7 +29,7 @@ func NewGetHandler(s query.GetByIDService, v *validator.Validate, t observabilit
 // @Success      200  {object} map[string]any
 // @Failure      400  {object} map[string]string "Bad Request"
 // @Failure      404  {object} map[string]string "Not Found"
-// @Router       /v1/products/{id} [get]
+// @Router       /products/{id} [get]
 func (h GetHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.GetByID")
     defer span.End()

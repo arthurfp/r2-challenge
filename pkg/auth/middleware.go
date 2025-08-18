@@ -3,7 +3,6 @@ package auth
 import (
     "net/http"
     "strings"
-
     "github.com/labstack/echo/v4"
 )
 
@@ -15,7 +14,19 @@ const (
 func JWTMiddleware(tm TokenManager, isPublic func(method, path string) bool) echo.MiddlewareFunc {
     return func(next echo.HandlerFunc) echo.HandlerFunc {
         return func(c echo.Context) error {
-            if isPublic(c.Request().Method, c.Path()) {
+            method := c.Request().Method
+            path := c.Path()
+            if path == "" {
+                if c.Request().URL != nil {
+                    path = c.Request().URL.Path
+                } else {
+                    path = c.Request().RequestURI
+                }
+            }
+            // Always allow public routes and special paths
+            if isPublic(method, path) ||
+                method == "OPTIONS" ||
+                strings.HasPrefix(path, "/swagger") || path == "/swagger.yaml" {
                 return next(c)
             }
 

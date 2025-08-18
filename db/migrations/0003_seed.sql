@@ -1,9 +1,9 @@
 -- Seed: Users
 INSERT INTO users (id, email, password_hash, name, role)
 VALUES
-    (gen_random_uuid(), 'admin@example.com', '$2y$10$Y7qkZ/JdFz2H1zYz6bH0hOS8J0bVx1v5o8h3y0yHhJmIu3KqA7nqS', 'Admin', 'admin'),
-    (gen_random_uuid(), 'alice@example.com', '$2y$10$Y7qkZ/JdFz2H1zYz6bH0hOS8J0bVx1v5o8h3y0yHhJmIu3KqA7nqS', 'Alice', 'user'),
-    (gen_random_uuid(), 'bob@example.com',   '$2y$10$Y7qkZ/JdFz2H1zYz6bH0hOS8J0bVx1v5o8h3y0yHhJmIu3KqA7nqS', 'Bob',   'user')
+    (gen_random_uuid(), 'admin@example.com', '$2a$10$ws9Psfj6YL06epZc0iFc/uY2pkEdCvapGbRfPuFt/rcJAZHEueDKq', 'Admin', 'admin'),
+    (gen_random_uuid(), 'alice@example.com', '$2a$10$ws9Psfj6YL06epZc0iFc/uY2pkEdCvapGbRfPuFt/rcJAZHEueDKq', 'Alice', 'user'),
+    (gen_random_uuid(), 'bob@example.com',   '$2a$10$ws9Psfj6YL06epZc0iFc/uY2pkEdCvapGbRfPuFt/rcJAZHEueDKq', 'Bob',   'user')
 ON CONFLICT DO NOTHING;
 
 -- Seed: Products

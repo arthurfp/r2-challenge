@@ -10,6 +10,7 @@ import (
     "r2-challenge/internal/user/domain"
     appdb "r2-challenge/pkg/db"
     "r2-challenge/pkg/observability"
+    "github.com/google/uuid"
 )
 
 type dbUserRepository struct {
@@ -26,6 +27,9 @@ func (r *dbUserRepository) Save(ctx context.Context, u domain.User) (domain.User
     defer span.End()
 
     now := time.Now().UTC()
+    if u.ID == "" {
+        u.ID = uuid.NewString()
+    }
     u.CreatedAt = now
     u.UpdatedAt = now
     if err := r.db.WithContext(ctx).Table("users").Create(&u).Error; err != nil {

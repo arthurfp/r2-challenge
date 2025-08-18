@@ -40,7 +40,7 @@ type loginRequest struct {
 // @Success      200  {object} map[string]string "access_token"
 // @Failure      400  {object} map[string]string "Bad Request"
 // @Failure      401  {object} map[string]string "Unauthorized"
-// @Router       /v1/auth/login [post]
+// @Router       /auth/login [post]
 func (h LoginHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.Login")
     defer span.End()

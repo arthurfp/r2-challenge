@@ -136,11 +136,33 @@ func runHTTPServer(
 	<div id="swagger-ui"></div>
 	<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
 	<script>
-	  let authToken = '';
-	  function setToken(){ authToken = document.getElementById('token').value || ''; }
+	  let authToken = localStorage.getItem('authToken') || '';
+	  function setToken(){
+	    let t = document.getElementById('token').value.trim();
+	    if(t && !/^Bearer\s+/i.test(t)) { t = 'Bearer ' + t; }
+	    authToken = t;
+	    localStorage.setItem('authToken', authToken);
+	  }
+	  // Prefill input from storage
+	  window.addEventListener('DOMContentLoaded', function(){
+	    if(authToken){ document.getElementById('token').value = authToken; }
+	  });
 	  window.ui = SwaggerUIBundle({
-		url:'/swagger.yaml',dom_id:'#swagger-ui',
-		requestInterceptor: (req) => { if(authToken){ req.headers['Authorization']=authToken; } return req; }
+	    url:'/swagger.yaml', dom_id:'#swagger-ui',
+	    requestInterceptor: (req) => { if(authToken){ req.headers['Authorization'] = authToken; } return req; },
+	    responseInterceptor: (res) => {
+	      try {
+	        if(res && res.url && res.status === 200 && /\/v1\/auth\/login$/.test(res.url)){
+	          const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+	          if(data && data.access_token){
+	            authToken = 'Bearer ' + data.access_token;
+	            localStorage.setItem('authToken', authToken);
+	            const el = document.getElementById('token'); if(el){ el.value = authToken; }
+	          }
+	        }
+	      } catch(e){}
+	      return res;
+	    }
 	  });
 	</script>
 	</body></html>`

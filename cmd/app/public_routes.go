@@ -21,6 +21,8 @@ var publicRoutes = map[routeKey]struct{}{
     {Method: GET, Path: "/v1/orders/:id"}:    {},
     {Method: GET, Path: "/swagger"}:          {},
     {Method: GET, Path: "/swagger.yaml"}:     {},
+    // Allow preflight and swagger assets without token
+    {Method: GET, Path: "/*"}:                 {},
 }
 
 

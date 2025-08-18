@@ -36,6 +36,22 @@ migrate:
 
 db-setup: docker-up wait-db migrate
 
+## Apply all migrations (0001_*.sql, 0002_*.sql, ...)
+migrate-all:
+	@set -e; \
+	for f in $$(ls -1 db/migrations/*.sql | sort); do \
+		echo "Applying $$f"; \
+		psql "host=$${DB_HOST:-localhost} port=$${DB_PORT:-5432} user=$${DB_USER:-postgres} password=$${DB_PASSWORD:-postgres} dbname=$${DB_NAME:-r2_db} sslmode=$${DB_SSLMODE:-disable}" -f $$f; \
+	done
+
+## Bring up DB+App and seed database
+docker-up-seed:
+	docker compose up -d db
+	$(MAKE) wait-db
+	$(MAKE) migrate-all
+	docker compose up -d app
+	@echo "Seed applied. Swagger: http://localhost:$${HTTP_PORT:-8080}/swagger"
+
 # Build Docker image
 docker-build:
 	docker build -t r2-challenge:local .
@@ -61,4 +77,26 @@ swag-gen-app:
 	# Done
 
 swaggen: swag-gen-app
+
+# Rebuild and redeploy the app container with latest code and swagger
+docker-rebuild:
+	$(MAKE) swaggen
+	docker compose build --no-cache app
+	docker compose up -d --force-recreate app
+
+# Rebuild and redeploy all services (app + db)
+docker-rebuild-all:
+	$(MAKE) swaggen
+	docker compose build --no-cache
+	docker compose up -d --force-recreate
+
+# Rebuild all services and seed database (DB up, apply migrations, app up)
+docker-rebuild-seed:
+	$(MAKE) swaggen
+	docker compose build --no-cache
+	docker compose up -d db
+	$(MAKE) wait-db
+	$(MAKE) migrate-all
+	docker compose up -d --force-recreate app
+	@echo "Rebuilt app and applied seed. Swagger: http://localhost:$${HTTP_PORT:-8080}/swagger"
 

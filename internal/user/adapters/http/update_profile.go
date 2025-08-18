@@ -38,7 +38,7 @@ type updateProfileRequest struct {
 // @Failure      400   {object} map[string]string "Bad Request"
 // @Failure      401   {object} map[string]string "Unauthorized"
 // @Failure      500   {object} map[string]string "Internal Server Error"
-// @Router       /v1/users/me [put]
+// @Router       /users/me [put]
 func (h UpdateProfileHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.UpdateProfile")
     defer span.End()

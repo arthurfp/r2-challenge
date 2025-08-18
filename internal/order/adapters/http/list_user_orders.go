@@ -34,7 +34,7 @@ func NewListUserOrdersHandler(s query.ListByUserService, v *validator.Validate, 
 // @Success      200     {array}  map[string]any
 // @Failure      401     {object} map[string]string "Unauthorized"
 // @Failure      500     {object} map[string]string "Internal Server Error"
-// @Router       /v1/users/{id}/orders [get]
+// @Router       /users/{id}/orders [get]
 func (h ListUserOrdersHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.ListByUser")
     defer span.End()

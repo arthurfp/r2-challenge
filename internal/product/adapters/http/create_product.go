@@ -39,7 +39,7 @@ type createProductRequest struct {
 // @Success      201      {object}  domain.Product
 // @Failure      400      {object}  map[string]string  "Bad Request"
 // @Failure      500      {object}  map[string]string  "Internal Server Error"
-// @Router       /v1/products [post]
+// @Router       /products [post]
 func (h CreateHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.Create")
     defer span.End()

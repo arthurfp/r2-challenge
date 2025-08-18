@@ -9,6 +9,7 @@ import (
     pmtdomain "r2-challenge/internal/payment/domain"
     appdb "r2-challenge/pkg/db"
     "r2-challenge/pkg/observability"
+    "github.com/google/uuid"
 )
 
 type dbPaymentRepository struct {
@@ -25,6 +26,9 @@ func (r *dbPaymentRepository) Save(ctx context.Context, payment pmtdomain.Paymen
     defer span.End()
 
     now := time.Now().UTC()
+    if payment.ID == "" { 
+        payment.ID = uuid.NewString()
+    }
     payment.CreatedAt = now
     payment.UpdatedAt = now
 

@@ -6,10 +6,12 @@ import (
     "time"
 
     "gorm.io/gorm"
+    "gorm.io/gorm/clause"
 
     "r2-challenge/internal/product/domain"
     appdb "r2-challenge/pkg/db"
     "r2-challenge/pkg/observability"
+    "github.com/google/uuid"
 )
 
 type dbProductRepository struct {
@@ -26,10 +28,13 @@ func (r *dbProductRepository) Save(ctx context.Context, product domain.Product) 
     defer span.End()
 
     now := time.Now().UTC()
+    if product.ID == "" {
+        product.ID = uuid.NewString()
+    }
     product.CreatedAt = now
     product.UpdatedAt = now
 
-    if err := r.db.WithContext(ctx).Table("products").Create(&product).Error; err != nil {
+    if err := r.db.WithContext(ctx).Table("products").Clauses(clause.Returning{Columns: []clause.Column{{Name: "id"}, {Name: "created_at"}, {Name: "updated_at"}}}).Create(&product).Error; err != nil {
         span.RecordError(err)
         return domain.Product{}, err
     }

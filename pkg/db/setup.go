@@ -18,9 +18,8 @@ func Setup(e envs.Envs) (*Database, error) {
         "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
         e.DBHost, e.DBPort, e.DBUser, e.DBPassword, e.DBName, e.DBSSLMode,
     )
-    g, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-        Logger: logger.Default.LogMode(logger.Silent),
-    })
+
+    g, err := gorm.Open(postgres.Open(dsn), &gorm.Config{ Logger: logger.Default.LogMode(logger.Silent) })
     if err != nil {
         return nil, err
     }

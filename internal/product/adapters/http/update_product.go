@@ -40,7 +40,7 @@ type updateProductRequest struct {
 // @Success      200      {object} domain.Product
 // @Failure      400      {object} map[string]string "Bad Request"
 // @Failure      404      {object} map[string]string "Not Found"
-// @Router       /v1/products/{id} [put]
+// @Router       /products/{id} [put]
 func (h UpdateHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.Update")
     defer span.End()

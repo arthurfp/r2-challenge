@@ -33,7 +33,7 @@ type updateStatusRequest struct { Status string `json:"status" validate:"require
 // @Success      200   {object} map[string]any
 // @Failure      400   {object} map[string]string "Bad Request"
 // @Failure      500   {object} map[string]string "Internal Server Error"
-// @Router       /v1/orders/{id}/status [put]
+// @Router       /orders/{id}/status [put]
 func (h UpdateStatusHandler) Handle(c echo.Context) error {
 	ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.UpdateStatus")
 	defer span.End()

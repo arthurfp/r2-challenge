@@ -35,7 +35,7 @@ func NewListHandler(s query.ListService, v *validator.Validate, t observability.
 // @Param        offset    query    int     false  "Offset"
 // @Success      200       {array}  map[string]any
 // @Failure      500       {object} map[string]string "Internal Server Error"
-// @Router       /v1/products [get]
+// @Router       /products [get]
 func (h ListHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.List")
     defer span.End()

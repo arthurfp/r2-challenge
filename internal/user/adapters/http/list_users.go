@@ -33,7 +33,7 @@ func NewListUsersHandler(s query.ListService, v *validator.Validate, t observabi
 // @Param        offset  query    int     false  "Offset"
 // @Success      200     {array}  map[string]any
 // @Failure      500     {object} map[string]string "Internal Server Error"
-// @Router       /v1/users [get]
+// @Router       /users [get]
 func (h ListUsersHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "UserHTTP.List")
     defer span.End()

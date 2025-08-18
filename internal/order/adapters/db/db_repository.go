@@ -5,10 +5,12 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"r2-challenge/internal/order/domain"
 	appdb "r2-challenge/pkg/db"
 	"r2-challenge/pkg/observability"
+	"github.com/google/uuid"
 )
 
 type dbOrderRepository struct {
@@ -25,21 +27,30 @@ func (r *dbOrderRepository) Save(ctx context.Context, order domain.Order) (domai
 	defer span.End()
 
 	now := time.Now().UTC()
+	if order.ID == "" { 
+		order.ID = uuid.NewString()
+	}
 	order.CreatedAt = now
 	order.UpdatedAt = now
 
 	tx := r.db.WithContext(ctx).Begin()
 
-	if err := tx.Table("orders").Create(&order).Error; err != nil {
+	// prevent auto-saving associations (items)
+	if err := tx.Omit(clause.Associations).Table("orders").Create(&order).Error; err != nil {
 		span.RecordError(err)
 		tx.Rollback()
 		return domain.Order{}, err
 	}
+
 	for i := range order.Items {
 		order.Items[i].OrderID = order.ID
+		if order.Items[i].ID == "" { 
+			order.Items[i].ID = uuid.NewString()
+		}
 	}
+
 	if len(order.Items) > 0 {
-		if err := tx.Table("order_items").Create(&order.Items).Error; err != nil {
+		if err := tx.Table("order_items").Omit("id").Create(&order.Items).Error; err != nil {
 			span.RecordError(err)
 			tx.Rollback()
 			return domain.Order{}, err

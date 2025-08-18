@@ -5,6 +5,7 @@ import (
 
     "github.com/go-playground/validator/v10"
     "github.com/labstack/echo/v4"
+    "github.com/google/uuid"
 
     "r2-challenge/internal/order/domain"
     "r2-challenge/internal/order/services/command"
@@ -41,7 +42,7 @@ type placeOrderRequest struct {
 // @Failure      400    {object} map[string]string "Bad Request"
 // @Failure      401    {object} map[string]string "Unauthorized"
 // @Failure      500    {object} map[string]string "Internal Server Error"
-// @Router       /v1/orders [post]
+// @Router       /orders [post]
 func (h PlaceOrderHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "OrderHTTP.Place")
     defer span.End()
@@ -66,6 +67,10 @@ func (h PlaceOrderHandler) Handle(c echo.Context) error {
     items := make([]domain.OrderItem, 0, len(req.Items))
     var total int64
     for _, it := range req.Items {
+        if _, err := uuid.Parse(it.ProductID); err != nil {
+            span.RecordError(err)
+            return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid product_id"})
+        }
         items = append(items, domain.OrderItem{ProductID: it.ProductID, Quantity: it.Quantity, PriceCents: it.PriceCents})
         total += it.PriceCents * it.Quantity
     }
@@ -76,8 +81,8 @@ func (h PlaceOrderHandler) Handle(c echo.Context) error {
         span.RecordError(err)
         return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
     }
-    
-	return c.JSON(http.StatusCreated, saved)
+
+    return c.JSON(http.StatusCreated, saved)
 }
 
 

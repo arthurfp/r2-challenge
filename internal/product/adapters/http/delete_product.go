@@ -29,7 +29,7 @@ func NewDeleteHandler(s command.DeleteService, v *validator.Validate, t observab
 // @Success      204  {string} string  "No Content"
 // @Failure      400  {object} map[string]string "Bad Request"
 // @Failure      404  {object} map[string]string "Not Found"
-// @Router       /v1/products/{id} [delete]
+// @Router       /products/{id} [delete]
 func (h DeleteHandler) Handle(c echo.Context) error {
     ctx, span := h.tracer.StartSpan(c.Request().Context(), "ProductHTTP.Delete")
     defer span.End()

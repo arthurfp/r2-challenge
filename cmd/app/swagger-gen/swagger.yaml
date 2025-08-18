@@ -7,7 +7,7 @@ info:
 servers:
 - url: /v1
 paths:
-  /v1/auth/login:
+  /auth/login:
     post:
       description: Authenticate and receive a JWT token
       requestBody:
@@ -46,7 +46,7 @@ paths:
       tags:
       - Auth
       x-codegen-request-body-name: credentials
-  /v1/auth/register:
+  /auth/register:
     post:
       description: Create a new user account
       requestBody:
@@ -83,7 +83,7 @@ paths:
       tags:
       - Auth
       x-codegen-request-body-name: user
-  /v1/orders:
+  /orders:
     post:
       description: Create an order for the authenticated user
       requestBody:
@@ -128,7 +128,7 @@ paths:
       tags:
       - Orders
       x-codegen-request-body-name: order
-  /v1/orders/{id}:
+  /orders/{id}:
     get:
       description: Get order by ID
       parameters:
@@ -165,7 +165,7 @@ paths:
       summary: Get order
       tags:
       - Orders
-  /v1/orders/{id}/status:
+  /orders/{id}/status:
     put:
       description: Update status for an order by ID
       parameters:
@@ -210,7 +210,7 @@ paths:
       tags:
       - Orders
       x-codegen-request-body-name: body
-  /v1/products:
+  /products:
     get:
       description: List products with optional filters
       parameters:
@@ -301,7 +301,7 @@ paths:
       tags:
       - Products
       x-codegen-request-body-name: product
-  /v1/products/{id}:
+  /products/{id}:
     delete:
       description: Delete a product by ID
       parameters:
@@ -416,7 +416,7 @@ paths:
       tags:
       - Products
       x-codegen-request-body-name: product
-  /v1/users:
+  /users:
     get:
       description: List users with optional filters
       parameters:
@@ -461,7 +461,7 @@ paths:
       summary: List users
       tags:
       - Users
-  /v1/users/{id}:
+  /users/{id}:
     get:
       description: Get a user by ID
       parameters:
@@ -498,7 +498,7 @@ paths:
       summary: Get user
       tags:
       - Users
-  /v1/users/{id}/orders:
+  /users/{id}/orders:
     get:
       description: List orders for the authenticated user
       parameters:
@@ -547,7 +547,7 @@ paths:
       summary: List my orders
       tags:
       - Orders
-  /v1/users/me:
+  /users/me:
     put:
       description: Update authenticated user's profile
       requestBody:
