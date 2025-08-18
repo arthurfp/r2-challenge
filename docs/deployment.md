@@ -19,6 +19,8 @@
   - ConfigMap for non-secrets, Secret for credentials
   - PodDisruptionBudget and Readiness/Liveness probes
   - Prometheus Operator scraping `/metrics`
+  - RBAC: enforce admin-only routes at the API level (already implemented) and at the Ingress
+  - Rolling updates and surge settings to ensure zero-downtime
 
 ## Postgres
 - Managed DB (e.g., RDS/GCP Cloud SQL) with TLS and automated backups
@@ -37,3 +39,10 @@
 ## CI/CD
 - Pipeline: build, test, lint, image build, push, deploy
 - Use immutable tags via `SERVICE`/`VERSION`
+ - Run migrations as a separate job or initContainer
+
+## What the challenge asked (addressed here)
+- Containerization with Docker (Dockerfile, compose)
+- Deployment suggestions (reverse proxy, Kubernetes, managed DB)
+- Observability (OTEL tracing, Prometheus metrics)
+- Security (JWT, RBAC, rate limiting, TLS)

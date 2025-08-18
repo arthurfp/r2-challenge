@@ -14,7 +14,7 @@ lint:
 	./bin/golangci-lint run ./...
 
 docker-up:
-	docker compose up -d db
+	docker compose up -d db app
 
 docker-down:
 	docker compose down
