@@ -15,7 +15,7 @@ type service struct {
     tracer observability.Tracer
 }
 
-func NewService(r repo.UserRepository, t observability.Tracer) (GetByIDService, error) {
+func NewGetByIDService(r repo.UserRepository, t observability.Tracer) (GetByIDService, error) {
     return &service{repo: r, tracer: t}, nil
 }
 

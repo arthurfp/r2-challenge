@@ -61,6 +61,9 @@ scrape_configs:
 - Generate/update spec with: `make swaggen` (alias to `swag-gen-app`).
 - Output file: `cmd/app/swagger-gen/swagger.yaml`.
 
+#### Live docs (Swagger UI)
+- When the app is running, visit `http://localhost:8080/swagger` to view and try the API endpoints directly from the browser.
+
 ## Structure
 - `cmd/app`: DI (fx), HTTP server and route registration
 - `internal/<bounded_context>`: domain, adapters (db/http), services (command/query)

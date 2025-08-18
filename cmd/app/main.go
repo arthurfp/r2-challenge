@@ -72,7 +72,9 @@ func main() {
 			userdb.NewDBRepository,
 			usercmd.NewRegisterService,
 			usercmd.NewUpdateProfileService,
-			userqry.NewService,
+			userqry.NewGetByIDService,
+			userqry.NewGetByEmailService,
+			userqry.NewListUsersService,
 			userhttp.NewRegisterHandler,
 			userhttp.NewLoginHandler,
 			userhttp.NewGetUserHandler,
@@ -80,8 +82,8 @@ func main() {
 			userhttp.NewUpdateProfileHandler,
 
 			orderdb.NewDBRepository,
-			payment.NewMockProcessor,
-			notification.NewMockSender,
+			payment.NewNoopProcessor,
+			notification.NewNoopSender,
 			pmtdb.NewDBRepository,
 			pmtcmd.NewService,
 			ordercmd.NewPlaceOrderService,
@@ -120,6 +122,18 @@ func runHTTPServer(
 	updateOrderStatus orderhttp.UpdateStatusHandler,
 ) error {
 	e := httpx.NewServer(tracer)
+
+	// Swagger UI serving (Option A): serve generated YAML and a minimal UI page
+	e.File("/swagger.yaml", "cmd/app/swagger-gen/swagger.yaml")
+	e.GET("/swagger", func(c echo.Context) error {
+		html := `<!doctype html><html><head><meta charset="utf-8"/><title>R2 Challenge API</title>
+	<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css"></head>
+	<body><div id="swagger-ui"></div>
+	<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+	<script>window.ui=SwaggerUIBundle({url:'/swagger.yaml',dom_id:'#swagger-ui'});</script>
+	</body></html>`
+		return c.HTML(http.StatusOK, html)
+	})
 
 	// Metrics
 	if envs.MetricsEnabled {

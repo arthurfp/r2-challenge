@@ -19,6 +19,8 @@ var publicRoutes = map[routeKey]struct{}{
     {Method: GET, Path: "/v1/products"}:      {},
     {Method: GET, Path: "/v1/products/:id"}:  {},
     {Method: GET, Path: "/v1/orders/:id"}:    {},
+    {Method: GET, Path: "/swagger"}:          {},
+    {Method: GET, Path: "/swagger.yaml"}:     {},
 }
 
 

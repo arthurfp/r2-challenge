@@ -15,8 +15,10 @@ type service struct {
     tracer observability.Tracer
 }
 
-func NewService(r repo.OrderRepository, t observability.Tracer) (GetByIDService, error) {
-    return &service{repo: r, tracer: t}, nil
+// NewService wires both GetByID and ListByUser services.
+func NewService(r repo.OrderRepository, t observability.Tracer) (GetByIDService, ListByUserService, error) {
+    s := &service{repo: r, tracer: t}
+    return s, s, nil
 }
 
 func (s *service) GetByID(ctx context.Context, id string) (domain.Order, error) {
