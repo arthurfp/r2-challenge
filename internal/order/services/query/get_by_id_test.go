@@ -16,11 +16,11 @@ func TestOrderGetByID_Success(t *testing.T) {
     t.Cleanup(ctrl.Finish)
 
     repo := orderdb.NewMockOrderRepository(ctrl)
-    svc, _ := NewService(repo, tracer)
+    getSvc, _, _ := NewService(repo, tracer)
 
     repo.EXPECT().GetByID(gomock.Any(), "o1").Return(domain.Order{ID: "o1"}, nil)
 
-    res, err := svc.GetByID(context.Background(), "o1")
+    res, err := getSvc.GetByID(context.Background(), "o1")
     if err != nil { t.Fatalf("err: %v", err) }
     if res.ID != "o1" { t.Fatalf("id mismatch") }
 }
