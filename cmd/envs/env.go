@@ -14,6 +14,10 @@ type Envs struct {
 	TLSCertFile       string `cfg:"TLS_CERT_FILE"`
 	TLSKeyFile        string `cfg:"TLS_KEY_FILE"`
 
+	MetricsEnabled    bool   `cfg:"METRICS_ENABLED" cfgDefault:"true"`
+	MetricsPath       string `cfg:"METRICS_PATH" cfgDefault:"/metrics"`
+	MetricsPort       string `cfg:"METRICS_PORT"`
+
 	DBHost            string `cfg:"DB_HOST" cfgDefault:"localhost"`
 	DBPort            string `cfg:"DB_PORT" cfgDefault:"5432"`
 	DBUser            string `cfg:"DB_USER" cfgDefault:"postgres"`

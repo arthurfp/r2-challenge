@@ -9,6 +9,8 @@ import (
 
 	"r2-challenge/cmd/envs"
 	"r2-challenge/pkg/httpx"
+	"github.com/labstack/echo/v4"
+	"r2-challenge/pkg/metrics"
 	"r2-challenge/pkg/db"
 	"r2-challenge/pkg/logger"
 	"r2-challenge/pkg/observability"
@@ -109,6 +111,20 @@ func runHTTPServer(
 	updateOrderStatus orderhttp.UpdateStatusHandler,
 ) error {
 	e := httpx.NewServer(tracer)
+
+	// Metrics
+	if envs.MetricsEnabled {
+		provider, handler, err := metrics.Setup()
+		if err == nil {
+			_ = provider // keep provider alive
+			e.Use(httpx.MetricsMiddleware(provider.Meter("r2-challenge")))
+			if envs.MetricsPort != "" {
+				go func() { _ = http.ListenAndServe(fmt.Sprintf(":%s", envs.MetricsPort), handler) }()
+			} else {
+				e.GET(envs.MetricsPath, echo.WrapHandler(handler))
+			}
+		}
+	}
 
 	// Rate limit per IP (RPM configurable)
 	e.Use(httpx.RateLimitMiddleware(envs.RateLimitRPM))
