@@ -1,41 +1,56 @@
-# Users
+# Users API
 
-Base paths: `/v1/auth` and `/v1/users`
+Base paths: `/v1/auth`, `/v1/users`
 
-## Register (public)
+## Model (domain)
+```json
+{
+  "id": "string",
+  "email": "string",
+  "name": "string",
+  "role": "user|admin"
+}
+```
+
+## Auth
+
+### Register (public)
 POST `/v1/auth/register`
+- Body: `email`, `name`, `password`
+- Success: 201 `User`
+- Errors: 400 validation, 500
+
+Example:
 ```bash
 curl -s -X POST http://localhost:8080/v1/auth/register \
   -H 'Content-Type: application/json' \
   -d '{"email":"user@example.com","name":"User","password":"secret"}'
 ```
 
-## Login (public)
+### Login (public)
 POST `/v1/auth/login`
-```bash
-curl -s -X POST http://localhost:8080/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"user@example.com","password":"secret"}'
-```
-Response includes `{"token":"<JWT>"}`.
+- Body: `email`, `password`
+- Success: 200 `{ "access_token": "..." }`
+- Errors: 400, 401 invalid credentials
 
-## Get user by ID (private)
-GET `/v1/users/:id`
-```bash
-curl -H 'Authorization: Bearer <JWT>' http://localhost:8080/v1/users/USER_ID
-```
+## Users
 
-## List users (private)
+### Get by ID (private)
+GET `/v1/users/{id}`
+- Success: 200 `User`
+- Errors: 400 invalid id, 404 not found
+
+### List (private)
 GET `/v1/users`
-```bash
-curl -H 'Authorization: Bearer <JWT>' http://localhost:8080/v1/users
-```
+- Query: `email`, `name`, `limit`, `offset`
+- Success: 200 `[User]`
+- Error: 500
 
-## Update my profile (private)
+### Update my profile (private)
 PUT `/v1/users/me`
-```bash
-curl -s -X PUT http://localhost:8080/v1/users/me \
-  -H 'Authorization: Bearer <JWT>' \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"New Name"}'
-```
+- Body: `name`, `email`
+- Success: 200 `User`
+- Errors: 400 validation, 401 unauthorized, 500
+
+## Error handling (patterns)
+- Same shapes as Products; 401/403 when JWT missing/invalid or role insufficient
