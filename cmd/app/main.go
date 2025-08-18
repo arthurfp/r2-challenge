@@ -212,14 +212,14 @@ func runHTTPServer(
 	authg.POST("/login", login.Handle)
 
 	v1.GET("/users/:id", getUser.Handle)
-	v1.GET("/users", listUsers.Handle)
+	v1.GET("/users", auth.RequireRoles("admin")(listUsers.Handle))
 	v1.PUT("/users/me", updateProfile.Handle)
 
 	// Orders
 	v1.POST("/orders", place.Handle)
 	v1.GET("/orders/:id", getOrder.Handle)
 	v1.GET("/users/:id/orders", listOrders.Handle)
-	v1.PUT("/orders/:id/status", updateOrderStatus.Handle)
+	v1.PUT("/orders/:id/status", auth.RequireRoles("admin")(updateOrderStatus.Handle))
 
 	readHeaderTimeout, _ := time.ParseDuration(envs.ReadHeaderTimeout)
 	httpTimeout, _ := time.ParseDuration(envs.HTTPTimeout)
