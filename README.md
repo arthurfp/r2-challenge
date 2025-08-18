@@ -10,6 +10,23 @@ make test
 # to run the app
 # go run ./cmd/app
 
+## Environment
+- `HTTP_HOST` (default: localhost)
+- `HTTP_PORT` (default: 8080)
+- `READ_HEADER_TIMEOUT` (default: 15s)
+- `HTTP_TIMEOUT` (default: 10s)
+- `RATE_LIMIT_RPM` (default: 60)
+- `TLS_CERT_FILE` (optional): Path to PEM certificate
+- `TLS_KEY_FILE` (optional): Path to PEM private key
+- `DB_*` (host, port, user, password, name, sslmode, pool params)
+- `JWT_SECRET`, `JWT_ISSUER`, `JWT_EXPIRE`
+
+### Example: run with TLS
+Assuming you have `server.crt` and `server.key` in the project root:
+```bash
+# start the server
+go run ./cmd/app
+
 ## Documentation
 - Overview and guides: `docs/`
 - Products: `docs/api/products.md`
@@ -21,6 +38,5 @@ make test
 - `internal/<bounded_context>`: domain, adapters (db/http), services (command/query)
 - `pkg`: infrastructure/utilities (auth, httpx, observability, validator, logger)
 - `db/migrations`: SQL migrations
-
 
 ## WIP
