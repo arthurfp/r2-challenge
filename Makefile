@@ -22,7 +22,25 @@ lint:
 	gofumpt -w .
 	golangci-lint run --issues-exit-code 1 --out-format colored-tab
 
-docker-up:
+## Kill any process using TCP port 5432 (PostgreSQL default)
+.PHONY: free-5432
+free-5432:
+	@echo "Releasing TCP port 5432 if occupied..."
+	# Try stopping compose DB service first
+	-@bash -c 'docker compose stop db 2>/dev/null || true'
+	# Stop any container exposing host port 5432
+	-@bash -c "docker ps --filter 'publish=5432' -q | xargs -r docker stop 2>/dev/null || true"
+	# Kill local processes bound to 5432 (best-effort, may require privileges)
+	-@bash -c 'fuser -k 5432/tcp 2>/dev/null || true'
+	-@bash -c 'pids=$$(lsof -ti tcp:5432 2>/dev/null || true); [ -z "$$pids" ] || kill -9 $$pids 2>/dev/null || true'
+	# Try stopping system service (passwordless sudo only)
+	-@bash -c 'command -v systemctl >/dev/null && sudo -n systemctl stop postgresql 2>/dev/null || true'
+	-@bash -c 'command -v service >/dev/null && sudo -n service postgresql stop 2>/dev/null || true'
+	@sleep 1
+	@echo "Current listeners on 5432 (if any):" 
+	-@bash -c "ss -ltnp '( sport = :5432 )' 2>/dev/null || true"
+
+docker-up: free-5432
 	docker compose up -d db app
 
 docker-down:
@@ -45,7 +63,7 @@ migrate-all:
 	done
 
 ## Bring up DB+App and seed database
-docker-up-seed:
+docker-up-seed: free-5432
 	docker compose up -d db
 	$(MAKE) wait-db
 	$(MAKE) migrate-all
@@ -91,7 +109,7 @@ docker-rebuild-all:
 	docker compose up -d --force-recreate
 
 # Rebuild all services and seed database (DB up, apply migrations, app up)
-docker-rebuild-seed:
+docker-rebuild-seed: free-5432
 	$(MAKE) swaggen
 	docker compose build --no-cache
 	docker compose up -d db

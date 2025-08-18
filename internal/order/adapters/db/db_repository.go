@@ -120,6 +120,30 @@ func (r *dbOrderRepository) ListByUser(ctx context.Context, userID string, filte
 		return nil, err
 	}
 
+	if len(orders) == 0 {
+		return orders, nil
+	}
+
+	ids := make([]string, 0, len(orders))
+	for _, ord := range orders {
+		ids = append(ids, ord.ID)
+	}
+
+	var items []domain.OrderItem
+	if err := r.db.WithContext(ctx).Table("order_items").Where("order_id IN ?", ids).Find(&items).Error; err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
+
+	itemsByOrder := make(map[string][]domain.OrderItem, len(orders))
+	for _, it := range items {
+		itemsByOrder[it.OrderID] = append(itemsByOrder[it.OrderID], it)
+	}
+
+	for i := range orders {
+		orders[i].Items = itemsByOrder[orders[i].ID]
+	}
+
 	return orders, nil
 }
 
