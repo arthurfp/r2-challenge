@@ -25,7 +25,7 @@ FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
 COPY --from=build /out/app /app/app
 # Copy generated OpenAPI spec used by the app at runtime
-COPY --from=build /src/cmd/app/swagger-gen/swagger.yaml /app/cmd/app/swagger-gen/swagger.yaml
+COPY --from=build /src/cmd/app/swagger-gen/swagger.yaml /app/swagger.yaml
 
 EXPOSE 8080 9090
 

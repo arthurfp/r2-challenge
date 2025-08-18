@@ -15,7 +15,6 @@ import (
 
 	"r2-challenge/cmd/envs"
 	"r2-challenge/pkg/httpx"
-	"github.com/labstack/echo/v4"
 	"r2-challenge/pkg/metrics"
 	"r2-challenge/pkg/db"
 	"r2-challenge/pkg/logger"
@@ -42,6 +41,8 @@ import (
 	notification "r2-challenge/internal/order/adapters/notification"
 	pmtdb "r2-challenge/internal/payment/adapters/db"
 	pmtcmd "r2-challenge/internal/payment/services/command"
+
+	"github.com/labstack/echo/v4"
 )
 
 // @title R2 Ecoomerce API
@@ -124,13 +125,24 @@ func runHTTPServer(
 	e := httpx.NewServer(tracer)
 
 	// Swagger UI serving (Option A): serve generated YAML and a minimal UI page
-	e.File("/swagger.yaml", "cmd/app/swagger-gen/swagger.yaml")
+	e.File("/swagger.yaml", "/app/swagger.yaml")
 	e.GET("/swagger", func(c echo.Context) error {
 		html := `<!doctype html><html><head><meta charset="utf-8"/><title>R2 Challenge API</title>
 	<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css"></head>
-	<body><div id="swagger-ui"></div>
+	<body><div id="header" style="padding:8px;border-bottom:1px solid #eee;">
+	  <input id="token" placeholder="Bearer <token>" style="width:60%;padding:6px;" />
+	  <button onclick="setToken()" style="padding:6px 12px;">Set Token</button>
+	</div>
+	<div id="swagger-ui"></div>
 	<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
-	<script>window.ui=SwaggerUIBundle({url:'/swagger.yaml',dom_id:'#swagger-ui'});</script>
+	<script>
+	  let authToken = '';
+	  function setToken(){ authToken = document.getElementById('token').value || ''; }
+	  window.ui = SwaggerUIBundle({
+		url:'/swagger.yaml',dom_id:'#swagger-ui',
+		requestInterceptor: (req) => { if(authToken){ req.headers['Authorization']=authToken; } return req; }
+	  });
+	</script>
 	</body></html>`
 		return c.HTML(http.StatusOK, html)
 	})
@@ -157,6 +169,10 @@ func runHTTPServer(
 	ttl, _ := time.ParseDuration(envs.JWTExpire)
 	tm := auth.NewTokenManager(envs.JWTSecret, envs.JWTIssuer, ttl)
 	e.Use(auth.JWTMiddleware(tm, func(method, path string) bool {
+		// Always allow preflight and Swagger/metrics endpoints
+		if method == "OPTIONS" || path == "/swagger" || path == "/swagger.yaml" || path == envs.MetricsPath {
+			return true
+		}
 		_, ok := publicRoutes[routeKey{Method: method, Path: path}]
 		return ok
 	}))
@@ -180,7 +196,7 @@ func runHTTPServer(
 	// Orders
 	v1.POST("/orders", place.Handle)
 	v1.GET("/orders/:id", getOrder.Handle)
-	v1.GET("/orders", listOrders.Handle)
+	v1.GET("/users/:id/orders", listOrders.Handle)
 	v1.PUT("/orders/:id/status", updateOrderStatus.Handle)
 
 	readHeaderTimeout, _ := time.ParseDuration(envs.ReadHeaderTimeout)
