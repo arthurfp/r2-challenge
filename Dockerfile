@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION=1.22
+ARG GO_VERSION=1.23
 
 FROM golang:${GO_VERSION}-alpine AS build
 WORKDIR /src
@@ -24,6 +24,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
 COPY --from=build /out/app /app/app
+# Copy generated OpenAPI spec used by the app at runtime
+COPY --from=build /src/cmd/app/swagger-gen/swagger.yaml /app/cmd/app/swagger-gen/swagger.yaml
 
 EXPOSE 8080 9090
 
