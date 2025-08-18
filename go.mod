@@ -8,6 +8,7 @@ require (
 	crg.eti.br/go/config v1.5.0
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/golang/mock v1.6.0
 	github.com/labstack/echo/v4 v4.13.4
 	go.opentelemetry.io/otel v1.29.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.29.0

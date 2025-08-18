@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -euo pipefail
+
+go install github.com/golang/mock/mockgen@main
+
+mock() {
+  local src="$1"
+  local file_name=$(echo "$src" | rev | cut -d '/' -f 1 | rev | cut -d '.' -f 1)
+  local file_path="$(echo "$src" | sed "s/$file_name.go//g")"
+  local dst="$file_path${file_name}_mock.go"
+  local pkg=$(head -n 1 "$src" | sed 's/package //g')
+
+  echo "(Package: $pkg): Mocking $src -> $dst"
+  mockgen -source "$src" -destination "$dst" -package "$pkg"
+}
+
+# Files to mock
+mock internal/product/adapters/db/interface.go
+mock internal/order/adapters/db/interface.go
+mock internal/order/adapters/payment/interface.go
+mock internal/order/adapters/notification/interface.go
+mock internal/payment/adapters/db/interface.go
+mock internal/payment/services/command/record_payment.go
+mock internal/product/services/command/create_product.go
+mock internal/product/services/command/update_product.go
+mock internal/product/services/command/delete_product.go
+mock internal/product/services/query/get_by_id.go
+mock internal/product/services/query/list.go
+mock internal/order/services/command/place_order.go
+mock internal/order/services/command/update_status.go
+mock internal/order/services/query/get_by_id.go
+mock internal/order/services/query/list_by_user.go
+mock internal/user/services/command/register_user.go
+mock internal/user/services/command/update_profile.go
