@@ -27,6 +27,26 @@ Assuming you have `server.crt` and `server.key` in the project root:
 # start the server
 go run ./cmd/app
 
+## Metrics (OTEL/Prometheus)
+- `METRICS_ENABLED` (default: true)
+- `METRICS_PATH` (default: /metrics)
+- `METRICS_PORT` (optional): if set, metrics are exposed on a dedicated server at `:${METRICS_PORT}`
+
+### Example Prometheus scrape config
+Scraping from the main server endpoint:
+```yaml
+scrape_configs:
+  - job_name: 'r2-challenge'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+Or scraping from a dedicated metrics server:
+```yaml
+scrape_configs:
+  - job_name: 'r2-challenge-metrics'
+    static_configs:
+      - targets: ['localhost:9090']
+
 ## Documentation
 - Overview and guides: `docs/`
 - Products: `docs/api/products.md`
