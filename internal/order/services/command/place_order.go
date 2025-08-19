@@ -12,7 +12,9 @@ import (
 	"r2-challenge/pkg/observability"
 )
 
-type PlaceOrderService interface { Place(ctx context.Context, order domain.Order) (domain.Order, error) }
+type PlaceOrderService interface {
+	Place(ctx context.Context, order domain.Order) (domain.Order, error)
+}
 
 type placeOrderService struct {
 	repo        orderdb.OrderRepository
@@ -62,5 +64,3 @@ func (s *placeOrderService) Place(ctx context.Context, order domain.Order) (doma
 
 	return saved, nil
 }
-
-

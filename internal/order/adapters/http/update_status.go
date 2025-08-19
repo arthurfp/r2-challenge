@@ -20,7 +20,9 @@ func NewUpdateStatusHandler(s command.UpdateStatusService, v *validator.Validate
 	return UpdateStatusHandler{service: s, validator: v, tracer: t}, nil
 }
 
-type updateStatusRequest struct { Status string `json:"status" validate:"required"` }
+type updateStatusRequest struct {
+	Status string `json:"status" validate:"required"`
+}
 
 // Update Order Status
 // @Summary      Update order status
@@ -63,5 +65,3 @@ func (h UpdateStatusHandler) Handle(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, order)
 }
-
-

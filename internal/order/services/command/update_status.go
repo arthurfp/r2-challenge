@@ -8,7 +8,9 @@ import (
 	"r2-challenge/pkg/observability"
 )
 
-type UpdateStatusService interface { UpdateStatus(ctx context.Context, orderID string, status string) (domain.Order, error) }
+type UpdateStatusService interface {
+	UpdateStatus(ctx context.Context, orderID string, status string) (domain.Order, error)
+}
 
 type updateStatusService struct {
 	repo   repo.OrderRepository
@@ -31,5 +33,3 @@ func (s *updateStatusService) UpdateStatus(ctx context.Context, orderID string, 
 
 	return order, nil
 }
-
-

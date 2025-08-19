@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'user',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ
 );
 
 -- Products
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS products (
     inventory BIGINT NOT NULL DEFAULT 0 CHECK (inventory >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    deleted_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_name_trgm ON products USING gin (name gin_trgm_ops);
@@ -31,6 +33,7 @@ CREATE TABLE IF NOT EXISTS orders (
     total_cents BIGINT NOT NULL CHECK (total_cents >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    deleted_at TIMESTAMPTZ 
 );
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
@@ -42,6 +45,9 @@ CREATE TABLE IF NOT EXISTS order_items (
     product_id UUID NOT NULL REFERENCES products(id),
     quantity BIGINT NOT NULL CHECK (quantity > 0),
     price_cents BIGINT NOT NULL CHECK (price_cents >= 0)
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    deleted_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 
@@ -49,10 +55,18 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
+-- Ensure trigram index exists after extension
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE c.relname = 'idx_products_name_trgm'
+    ) THEN
+        CREATE INDEX idx_products_name_trgm ON products USING gin (name gin_trgm_ops);
+    END IF;
+END $$;
 
-
--- Soft delete columns
-ALTER TABLE IF NOT EXISTS users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
-ALTER TABLE IF NOT EXISTS products ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
-ALTER TABLE IF NOT EXISTS orders ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
-ALTER TABLE IF NOT EXISTS order_items ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+-- Increase inventory to avoid depletion during load tests
+UPDATE products SET inventory = GREATEST(inventory, 100000);

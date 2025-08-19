@@ -26,7 +26,9 @@ type otelSpan struct{ span trace.Span }
 
 func (s otelSpan) End() { s.span.End() }
 func (s otelSpan) RecordError(err error) {
-	if err == nil { return }
+	if err == nil {
+		return
+	}
 	s.span.RecordError(err)
 	s.span.SetAttributes(attribute.String("error", err.Error()))
 }
@@ -39,7 +41,9 @@ func (t otelTracer) StartSpan(ctx context.Context, name string) (context.Context
 // SetupTracer sets a basic OTEL tracer provider; stdout exporter is disabled by default.
 func SetupTracer() (Tracer, error) {
 	exp, err := stdouttrace.New(stdouttrace.WithWriter(io.Discard))
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	tp := sdktrace.NewTracerProvider(sdktrace.WithBatcher(exp))
 	otel.SetTracerProvider(tp)
 	return otelTracer{tracer: otel.Tracer("r2-challenge")}, nil

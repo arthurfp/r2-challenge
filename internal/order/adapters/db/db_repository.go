@@ -10,6 +10,7 @@ import (
 	"r2-challenge/internal/order/domain"
 	appdb "r2-challenge/pkg/db"
 	"r2-challenge/pkg/observability"
+
 	"github.com/google/uuid"
 )
 
@@ -27,7 +28,7 @@ func (r *dbOrderRepository) Save(ctx context.Context, order domain.Order) (domai
 	defer span.End()
 
 	now := time.Now().UTC()
-	if order.ID == "" { 
+	if order.ID == "" {
 		order.ID = uuid.NewString()
 	}
 	order.CreatedAt = now
@@ -44,7 +45,7 @@ func (r *dbOrderRepository) Save(ctx context.Context, order domain.Order) (domai
 
 	for i := range order.Items {
 		order.Items[i].OrderID = order.ID
-		if order.Items[i].ID == "" { 
+		if order.Items[i].ID == "" {
 			order.Items[i].ID = uuid.NewString()
 		}
 	}
@@ -159,5 +160,3 @@ func (r *dbOrderRepository) ListByUser(ctx context.Context, userID string, filte
 
 	return orders, nil
 }
-
-

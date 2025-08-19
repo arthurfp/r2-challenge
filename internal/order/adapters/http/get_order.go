@@ -55,5 +55,3 @@ func (h GetOrderHandler) Handle(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, order)
 }
-
-

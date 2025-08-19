@@ -14,9 +14,9 @@ type Envs struct {
 	TLSCertFile       string `cfg:"TLS_CERT_FILE"`
 	TLSKeyFile        string `cfg:"TLS_KEY_FILE"`
 
-	MetricsEnabled    bool   `cfg:"METRICS_ENABLED" cfgDefault:"true"`
-	MetricsPath       string `cfg:"METRICS_PATH" cfgDefault:"/metrics"`
-	MetricsPort       string `cfg:"METRICS_PORT"`
+	MetricsEnabled bool   `cfg:"METRICS_ENABLED" cfgDefault:"true"`
+	MetricsPath    string `cfg:"METRICS_PATH" cfgDefault:"/metrics"`
+	MetricsPort    string `cfg:"METRICS_PORT"`
 
 	DBHost            string `cfg:"DB_HOST" cfgDefault:"localhost"`
 	DBPort            string `cfg:"DB_PORT" cfgDefault:"5432"`
@@ -28,18 +28,17 @@ type Envs struct {
 	DBMaxIdleConns    int    `cfg:"DB_MAX_IDLE_CONNS" cfgDefault:"5"`
 	DBConnMaxLifetime string `cfg:"DB_CONN_MAX_LIFETIME" cfgDefault:"1h"`
 
-	JWTSecret         string `cfg:"JWT_SECRET" cfgDefault:"devsecret"`
-	JWTIssuer         string `cfg:"JWT_ISSUER" cfgDefault:"r2-challenge"`
-	JWTExpire         string `cfg:"JWT_EXPIRE" cfgDefault:"1h"`
+	JWTSecret string `cfg:"JWT_SECRET" cfgDefault:"devsecret"`
+	JWTIssuer string `cfg:"JWT_ISSUER" cfgDefault:"r2-challenge"`
+	JWTExpire string `cfg:"JWT_EXPIRE" cfgDefault:"1h"`
 
 	// Redis (optional)
-	RedisAddr         string `cfg:"REDIS_ADDR" cfgDefault:"localhost:6379"`
-	RedisPassword     string `cfg:"REDIS_PASSWORD"`
-	RedisDB           int    `cfg:"REDIS_DB" cfgDefault:"0"`
+	RedisAddr     string `cfg:"REDIS_ADDR" cfgDefault:"localhost:6379"`
+	RedisPassword string `cfg:"REDIS_PASSWORD"`
+	RedisDB       int    `cfg:"REDIS_DB" cfgDefault:"0"`
 }
 
 func NewEnvs() (Envs, error) {
 	var e Envs
 	return e, config.Parse(&e)
 }
-

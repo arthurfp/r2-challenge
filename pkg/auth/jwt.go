@@ -1,51 +1,51 @@
 package auth
 
 import (
-    "time"
+	"time"
 
-    "github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type TokenManager struct {
-    secret []byte
-    issuer string
-    ttl    time.Duration
+	secret []byte
+	issuer string
+	ttl    time.Duration
 }
 
 func NewTokenManager(secret, issuer string, ttl time.Duration) TokenManager {
-    return TokenManager{secret: []byte(secret), issuer: issuer, ttl: ttl}
+	return TokenManager{secret: []byte(secret), issuer: issuer, ttl: ttl}
 }
 
 func (tm TokenManager) Generate(subject string, claims map[string]any) (string, error) {
-    now := time.Now().UTC()
-    std := jwt.MapClaims{
-        "iss": tm.issuer,
-        "sub": subject,
-        "iat": now.Unix(),
-        "exp": now.Add(tm.ttl).Unix(),
-    }
-    for k, v := range claims { std[k] = v }
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, std)
-    return token.SignedString(tm.secret)
+	now := time.Now().UTC()
+	std := jwt.MapClaims{
+		"iss": tm.issuer,
+		"sub": subject,
+		"iat": now.Unix(),
+		"exp": now.Add(tm.ttl).Unix(),
+	}
+	for k, v := range claims {
+		std[k] = v
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, std)
+	return token.SignedString(tm.secret)
 }
 
 func (tm TokenManager) Verify(tokenString string) (jwt.MapClaims, error) {
-    parsed, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
-        if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, jwt.ErrSignatureInvalid
-        }
-        return tm.secret, nil
-    }, jwt.WithIssuer(tm.issuer))
-    if err != nil {
-        return nil, err
-    }
+	parsed, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return tm.secret, nil
+	}, jwt.WithIssuer(tm.issuer))
+	if err != nil {
+		return nil, err
+	}
 
-    claims, ok := parsed.Claims.(jwt.MapClaims)
-    if !ok || !parsed.Valid {
-        return nil, jwt.ErrTokenInvalidClaims
-    }
+	claims, ok := parsed.Claims.(jwt.MapClaims)
+	if !ok || !parsed.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
 
-    return claims, nil
+	return claims, nil
 }
-
-

@@ -24,11 +24,23 @@ export default function () {
     'list products 200': (r) => r.status === 200,
   });
 
-  // Place order (private) with Idempotency-Key
+  let chosen = null;
+  try {
+    const arr = listRes.json();
+    if (Array.isArray(arr) && arr.length > 0) {
+      // Distribui entre produtos para evitar esgotar estoque de um único item
+      const idx = (Number(__ITER) + Number(__VU)) % arr.length;
+      chosen = arr[idx];
+    }
+  } catch (_) {}
+
+  // Place order (private) com Idempotency-Key
   const idemKey = `ord-${__VU}-${Date.now()}`;
   const payload = JSON.stringify({
     items: [
-      { product_id: '11111111-1111-1111-1111-111111111111', quantity: 1, price_cents: 100 },
+      chosen
+        ? { product_id: chosen.id, quantity: 1, price_cents: chosen.price_cents || 100 }
+        : { product_id: '00000000-0000-0000-0000-000000000000', quantity: 1, price_cents: 100 },
     ],
   });
 

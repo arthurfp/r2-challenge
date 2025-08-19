@@ -14,32 +14,32 @@ import (
 	"go.uber.org/fx"
 
 	"r2-challenge/cmd/envs"
-	"r2-challenge/pkg/httpx"
-	"r2-challenge/pkg/metrics"
-	"r2-challenge/pkg/db"
 	"r2-challenge/pkg/cache"
+	"r2-challenge/pkg/db"
+	"r2-challenge/pkg/httpx"
 	"r2-challenge/pkg/logger"
+	"r2-challenge/pkg/metrics"
 	"r2-challenge/pkg/observability"
 	"r2-challenge/pkg/validator"
 
 	"r2-challenge/pkg/auth"
 
-	producthttp "r2-challenge/internal/product/adapters/http"
 	productdb "r2-challenge/internal/product/adapters/db"
+	producthttp "r2-challenge/internal/product/adapters/http"
 	productcmd "r2-challenge/internal/product/services/command"
 	productqry "r2-challenge/internal/product/services/query"
 
-	userhttp "r2-challenge/internal/user/adapters/http"
 	userdb "r2-challenge/internal/user/adapters/db"
+	userhttp "r2-challenge/internal/user/adapters/http"
 	usercmd "r2-challenge/internal/user/services/command"
 	userqry "r2-challenge/internal/user/services/query"
 
-	orderhttp "r2-challenge/internal/order/adapters/http"
 	orderdb "r2-challenge/internal/order/adapters/db"
+	orderhttp "r2-challenge/internal/order/adapters/http"
+	notification "r2-challenge/internal/order/adapters/notification"
+	payment "r2-challenge/internal/order/adapters/payment"
 	ordercmd "r2-challenge/internal/order/services/command"
 	orderqry "r2-challenge/internal/order/services/query"
-	payment "r2-challenge/internal/order/adapters/payment"
-	notification "r2-challenge/internal/order/adapters/notification"
 	pmtdb "r2-challenge/internal/payment/adapters/db"
 	pmtcmd "r2-challenge/internal/payment/services/command"
 
@@ -195,4 +195,3 @@ func runHTTPServer(
 	lc.Append(httpx.ServerLifecycleTLS(e, server, httpTimeout, envs.TLSCertFile, envs.TLSKeyFile))
 	return nil
 }
-

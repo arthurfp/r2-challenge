@@ -13,5 +13,3 @@ type service struct {
 func NewService(r repo.ProductRepository, t observability.Tracer) (GetByIDService, ListService, error) {
 	return &service{repo: r, tracer: t}, &service{repo: r, tracer: t}, nil
 }
-
-

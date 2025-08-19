@@ -41,7 +41,7 @@ services:
       JWT_SECRET: devsecret
       JWT_ISSUER: r2-challenge
       JWT_EXPIRE: 1h
-      RATE_LIMIT_RPM: 120
+      RATE_LIMIT_RPM: 100000
       METRICS_ENABLED: "true"
       METRICS_PATH: /metrics
       REDIS_ADDR: redis:6379

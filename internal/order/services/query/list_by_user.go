@@ -7,7 +7,9 @@ import (
 	"r2-challenge/internal/order/domain"
 )
 
-type ListByUserService interface { ListByUser(ctx context.Context, userID string, filter repo.OrderFilter) ([]domain.Order, error) }
+type ListByUserService interface {
+	ListByUser(ctx context.Context, userID string, filter repo.OrderFilter) ([]domain.Order, error)
+}
 
 func (s *service) ListByUser(ctx context.Context, userID string, filter repo.OrderFilter) ([]domain.Order, error) {
 	ctx, span := s.tracer.StartSpan(ctx, "OrderQuery.ListByUser")
@@ -21,5 +23,3 @@ func (s *service) ListByUser(ctx context.Context, userID string, filter repo.Ord
 
 	return list, nil
 }
-
-
