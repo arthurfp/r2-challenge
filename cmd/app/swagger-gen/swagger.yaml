@@ -688,17 +688,20 @@ components:
       type: object
     r2-challenge_internal_order_domain.Order:
       example:
+        deletedAt: deletedAt
         updated_at: updated_at
         user_id: user_id
         created_at: created_at
         id: id
         items:
-        - quantity: 6
+        - deletedAt: deletedAt
+          quantity: 6
           product_id: product_id
           price_cents: 0
           id: id
           order_id: order_id
-        - quantity: 6
+        - deletedAt: deletedAt
+          quantity: 6
           product_id: product_id
           price_cents: 0
           id: id
@@ -707,6 +710,8 @@ components:
         status: status
       properties:
         created_at:
+          type: string
+        deletedAt:
           type: string
         id:
           type: string
@@ -727,12 +732,15 @@ components:
       type: object
     r2-challenge_internal_order_domain.OrderItem:
       example:
+        deletedAt: deletedAt
         quantity: 6
         product_id: product_id
         price_cents: 0
         id: id
         order_id: order_id
       properties:
+        deletedAt:
+          type: string
         id:
           type: string
         order_id:
@@ -751,6 +759,7 @@ components:
       type: object
     r2-challenge_internal_product_domain.Product:
       example:
+        deletedAt: deletedAt
         updated_at: updated_at
         name: name
         created_at: created_at
@@ -763,6 +772,8 @@ components:
         category:
           type: string
         created_at:
+          type: string
+        deletedAt:
           type: string
         description:
           type: string
@@ -786,6 +797,7 @@ components:
       type: object
     r2-challenge_internal_user_domain.User:
       example:
+        deletedAt: deletedAt
         role: role
         updated_at: updated_at
         name: name
@@ -794,6 +806,8 @@ components:
         email: email
       properties:
         created_at:
+          type: string
+        deletedAt:
           type: string
         email:
           type: string

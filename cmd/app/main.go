@@ -127,50 +127,9 @@ func runHTTPServer(
 ) error {
 	e := httpx.NewServer(tracer)
 
-	// Swagger UI serving (Option A): serve generated YAML and a minimal UI page
+	// Swagger UI
 	e.File("/swagger.yaml", "/app/swagger.yaml")
-	e.GET("/swagger", func(c echo.Context) error {
-		html := `<!doctype html><html><head><meta charset="utf-8"/><title>R2 Challenge API</title>
-	<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css"></head>
-	<body><div id="header" style="padding:8px;border-bottom:1px solid #eee;">
-	  <input id="token" placeholder="Bearer <token>" style="width:60%;padding:6px;" />
-	  <button onclick="setToken()" style="padding:6px 12px;">Set Token</button>
-	</div>
-	<div id="swagger-ui"></div>
-	<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
-	<script>
-	  let authToken = localStorage.getItem('authToken') || '';
-	  function setToken(){
-	    let t = document.getElementById('token').value.trim();
-	    if(t && !/^Bearer\s+/i.test(t)) { t = 'Bearer ' + t; }
-	    authToken = t;
-	    localStorage.setItem('authToken', authToken);
-	  }
-	  // Prefill input from storage
-	  window.addEventListener('DOMContentLoaded', function(){
-	    if(authToken){ document.getElementById('token').value = authToken; }
-	  });
-	  window.ui = SwaggerUIBundle({
-	    url:'/swagger.yaml', dom_id:'#swagger-ui',
-	    requestInterceptor: (req) => { if(authToken){ req.headers['Authorization'] = authToken; } return req; },
-	    responseInterceptor: (res) => {
-	      try {
-	        if(res && res.url && res.status === 200 && /\/v1\/auth\/login$/.test(res.url)){
-	          const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
-	          if(data && data.access_token){
-	            authToken = 'Bearer ' + data.access_token;
-	            localStorage.setItem('authToken', authToken);
-	            const el = document.getElementById('token'); if(el){ el.value = authToken; }
-	          }
-	        }
-	      } catch(e){}
-	      return res;
-	    }
-	  });
-	</script>
-	</body></html>`
-		return c.HTML(http.StatusOK, html)
-	})
+	e.GET("/swagger", func(c echo.Context) error { return c.HTML(http.StatusOK, swaggerHTML) })
 
 	// Metrics
 	if envs.MetricsEnabled {
@@ -186,7 +145,7 @@ func runHTTPServer(
 		}
 	}
 
-	// Rate limit per IP (RPM configurable)
+	// Rate limit per IP
 	e.Use(httpx.RateLimitMiddleware(envs.RateLimitRPM))
 
 	v1 := e.Group("/v1")
@@ -194,7 +153,6 @@ func runHTTPServer(
 	ttl, _ := time.ParseDuration(envs.JWTExpire)
 	tm := auth.NewTokenManager(envs.JWTSecret, envs.JWTIssuer, ttl)
 	e.Use(auth.JWTMiddleware(tm, func(method, path string) bool {
-		// Always allow preflight and Swagger/metrics endpoints
 		if method == "OPTIONS" || path == "/swagger" || path == "/swagger.yaml" || path == envs.MetricsPath {
 			return true
 		}
