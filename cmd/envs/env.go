@@ -31,6 +31,11 @@ type Envs struct {
 	JWTSecret         string `cfg:"JWT_SECRET" cfgDefault:"devsecret"`
 	JWTIssuer         string `cfg:"JWT_ISSUER" cfgDefault:"r2-challenge"`
 	JWTExpire         string `cfg:"JWT_EXPIRE" cfgDefault:"1h"`
+
+	// Redis (optional)
+	RedisAddr         string `cfg:"REDIS_ADDR" cfgDefault:"localhost:6379"`
+	RedisPassword     string `cfg:"REDIS_PASSWORD"`
+	RedisDB           int    `cfg:"REDIS_DB" cfgDefault:"0"`
 }
 
 func NewEnvs() (Envs, error) {

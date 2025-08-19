@@ -17,6 +17,7 @@ import (
 	"r2-challenge/pkg/httpx"
 	"r2-challenge/pkg/metrics"
 	"r2-challenge/pkg/db"
+	"r2-challenge/pkg/cache"
 	"r2-challenge/pkg/logger"
 	"r2-challenge/pkg/observability"
 	"r2-challenge/pkg/validator"
@@ -56,10 +57,11 @@ func main() {
 			observability.SetupTracer,
 			validator.Setup,
 			db.Setup,
+			cache.SetupFromEnv,
 		),
 
 		fx.Provide(
-			productdb.NewDBRepository,
+			productdb.NewRepository,
 			productcmd.NewCreateService,
 			productcmd.NewUpdateService,
 			productcmd.NewDeleteService,
@@ -70,7 +72,7 @@ func main() {
 			producthttp.NewGetHandler,
 			producthttp.NewListHandler,
 
-			userdb.NewDBRepository,
+			userdb.NewRepository,
 			usercmd.NewRegisterService,
 			usercmd.NewUpdateProfileService,
 			userqry.NewGetByIDService,
@@ -107,6 +109,7 @@ func runHTTPServer(
 	envs envs.Envs,
 	tracer observability.Tracer,
 	_ *db.Database,
+	cch *cache.Client,
 	create producthttp.CreateHandler,
 	update producthttp.UpdateHandler,
 	deleteH producthttp.DeleteHandler,
@@ -216,7 +219,8 @@ func runHTTPServer(
 	v1.PUT("/users/me", updateProfile.Handle)
 
 	// Orders
-	v1.POST("/orders", place.Handle)
+	// Idempotency only for order placement (short TTL)
+	v1.POST("/orders", place.Handle, httpx.IdempotencyMiddleware(cch, 2*time.Minute))
 	v1.GET("/orders/:id", auth.RequireRoles("admin")(getOrder.Handle))
 	v1.GET("/users/:id/orders", listOrders.Handle)
 	v1.PUT("/orders/:id/status", auth.RequireRoles("admin")(updateOrderStatus.Handle))

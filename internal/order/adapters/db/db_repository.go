@@ -50,6 +50,19 @@ func (r *dbOrderRepository) Save(ctx context.Context, order domain.Order) (domai
 	}
 
 	if len(order.Items) > 0 {
+		// Atomic inventory check and decrement per item
+		for _, it := range order.Items {
+			res := tx.Exec("UPDATE products SET inventory = inventory - ? WHERE id = ? AND inventory >= ?", it.Quantity, it.ProductID, it.Quantity)
+			if res.Error != nil {
+				span.RecordError(res.Error)
+				tx.Rollback()
+				return domain.Order{}, res.Error
+			}
+			if res.RowsAffected == 0 {
+				tx.Rollback()
+				return domain.Order{}, gorm.ErrInvalidData
+			}
+		}
 		if err := tx.Table("order_items").Omit("id").Create(&order.Items).Error; err != nil {
 			span.RecordError(err)
 			tx.Rollback()
